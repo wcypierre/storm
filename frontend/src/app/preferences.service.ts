@@ -2,15 +2,23 @@ import {Injectable} from '@angular/core';
 import {State, Torrent} from './api.service';
 
 /**
+ * Valid sort field values for torrents
+ */
+export type SortField = 'State' | 'TimeAdded' | 'Progress' | 'ETA' | 'Name' | 'TotalSize' | 'Ratio' | 'SeedingTime';
+
+/**
  * User preferences for filtering and sorting torrents
  */
 export interface UserPreferences {
-  sortByField: keyof Torrent | null;
+  sortByField: SortField | null;
   sortReverse: boolean;
   filterState: State | null;
 }
 
 const STORAGE_KEY = 'storm_preferences';
+
+const VALID_SORT_FIELDS: SortField[] = ['State', 'TimeAdded', 'Progress', 'ETA', 'Name', 'TotalSize', 'Ratio', 'SeedingTime'];
+const VALID_FILTER_STATES: (State | null)[] = [null, 'Active', 'Queued', 'Downloading', 'Seeding', 'Paused', 'Error'];
 
 const DEFAULT_PREFERENCES: UserPreferences = {
   sortByField: null,
@@ -35,9 +43,14 @@ export class PreferencesService {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
+        // Validate and sanitize stored values
+        const sortByField = VALID_SORT_FIELDS.includes(parsed.sortByField) ? parsed.sortByField : null;
+        const sortReverse = typeof parsed.sortReverse === 'boolean' ? parsed.sortReverse : false;
+        const filterState = VALID_FILTER_STATES.includes(parsed.filterState) ? parsed.filterState : null;
         return {
-          ...DEFAULT_PREFERENCES,
-          ...parsed,
+          sortByField,
+          sortReverse,
+          filterState,
         };
       }
     } catch (e) {

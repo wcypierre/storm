@@ -58,6 +58,27 @@ describe('PreferencesService', () => {
       expect(prefs.sortReverse).toBe(false);
       expect(prefs.filterState).toBeNull();
     });
+
+    it('should return default values for invalid sort fields', () => {
+      localStorage.setItem('storm_preferences', JSON.stringify({sortByField: 'InvalidField'}));
+
+      const prefs = service.load();
+      expect(prefs.sortByField).toBeNull();
+    });
+
+    it('should return default values for invalid filter states', () => {
+      localStorage.setItem('storm_preferences', JSON.stringify({filterState: 'InvalidState'}));
+
+      const prefs = service.load();
+      expect(prefs.filterState).toBeNull();
+    });
+
+    it('should return default values for invalid sortReverse type', () => {
+      localStorage.setItem('storm_preferences', JSON.stringify({sortReverse: 'yes'}));
+
+      const prefs = service.load();
+      expect(prefs.sortReverse).toBe(false);
+    });
   });
 
   describe('save', () => {

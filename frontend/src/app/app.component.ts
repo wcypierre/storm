@@ -6,7 +6,7 @@ import {SelectItem} from 'primeng/api';
 import {FocusService} from './focus.service';
 import {DialogService} from 'primeng/dynamicdialog';
 import {PluginEnableComponent} from './components/plugin-enable/plugin-enable.component';
-import {PreferencesService} from './preferences.service';
+import {PreferencesService, SortField} from './preferences.service';
 
 type OptionalState = State | null;
 
@@ -17,14 +17,14 @@ type OptionalState = State | null;
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  private _sortByField: keyof Torrent = null;
+  private _sortByField: SortField = null;
   private _sortReverse = false;
 
-  get sortByField(): keyof Torrent {
+  get sortByField(): SortField {
     return this._sortByField;
   }
 
-  set sortByField(value: keyof Torrent) {
+  set sortByField(value: SortField) {
     this._sortByField = value;
     this.preferences.save({sortByField: value});
   }
@@ -38,7 +38,7 @@ export class AppComponent {
     this.preferences.save({sortReverse: value});
   }
 
-  sortOptions: SelectItem<keyof Torrent>[] = [
+  sortOptions: SelectItem<SortField>[] = [
     {
       label: 'State',
       value: 'State'
