@@ -6,6 +6,7 @@ import {SelectItem} from 'primeng/api';
 import {FocusService} from './focus.service';
 import {DialogService} from 'primeng/dynamicdialog';
 import {PluginEnableComponent} from './components/plugin-enable/plugin-enable.component';
+import {PreferencesService, SortField} from './preferences.service';
 
 type OptionalState = State | null;
 
@@ -16,10 +17,28 @@ type OptionalState = State | null;
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  sortByField: keyof Torrent = null;
-  sortReverse = false;
+  private _sortByField: SortField = null;
+  private _sortReverse = false;
 
-  sortOptions: SelectItem<keyof Torrent>[] = [
+  get sortByField(): SortField {
+    return this._sortByField;
+  }
+
+  set sortByField(value: SortField) {
+    this._sortByField = value;
+    this.preferences.save({sortByField: value});
+  }
+
+  get sortReverse(): boolean {
+    return this._sortReverse;
+  }
+
+  set sortReverse(value: boolean) {
+    this._sortReverse = value;
+    this.preferences.save({sortReverse: value});
+  }
+
+  sortOptions: SelectItem<SortField>[] = [
     {
       label: 'State',
       value: 'State'
@@ -112,8 +131,13 @@ export class AppComponent {
 
   get$: BehaviorSubject<OptionalState>;
 
-  constructor(private api: ApiService, private focus: FocusService, private dialogService: DialogService) {
-    this.get$ = new BehaviorSubject<OptionalState>(null);
+  constructor(private api: ApiService, private focus: FocusService, private dialogService: DialogService, private preferences: PreferencesService) {
+    // Load saved preferences
+    const savedPrefs = this.preferences.load();
+    this._sortByField = savedPrefs.sortByField;
+    this._sortReverse = savedPrefs.sortReverse;
+
+    this.get$ = new BehaviorSubject<OptionalState>(savedPrefs.filterState);
     this.refreshInterval(2000);
   }
 
@@ -215,5 +239,14 @@ export class AppComponent {
     res.subscribe(
       _ => console.log(`torrents in view reached target state ${targetState}`)
     );
+  }
+
+  /**
+   * Called when the filter state dropdown changes
+   * @param state The new filter state
+   */
+  onFilterStateChange(state: OptionalState): void {
+    this.get$.next(state);
+    this.preferences.save({filterState: state});
   }
 }
