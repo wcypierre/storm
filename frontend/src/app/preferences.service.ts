@@ -34,12 +34,31 @@ export class PreferencesService {
     try {
       const stored = localStorage.getItem(this.STORAGE_KEY);
       if (stored) {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        // Validate that the parsed object has the expected structure
+        if (this.isValidFilterPreferences(parsed)) {
+          return parsed;
+        }
+        console.warn('Invalid preferences structure in localStorage, ignoring');
       }
     } catch (e) {
       console.warn('Failed to load preferences from localStorage', e);
     }
     return null;
+  }
+
+  /**
+   * Validate that an object matches the FilterPreferences interface
+   */
+  private isValidFilterPreferences(obj: any): obj is FilterPreferences {
+    return (
+      obj !== null &&
+      typeof obj === 'object' &&
+      (obj.sortByField === null || typeof obj.sortByField === 'string') &&
+      typeof obj.sortReverse === 'boolean' &&
+      typeof obj.searchText === 'string' &&
+      (obj.filterState === null || typeof obj.filterState === 'string')
+    );
   }
 
   /**

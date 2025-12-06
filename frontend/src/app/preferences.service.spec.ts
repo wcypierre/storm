@@ -54,4 +54,24 @@ describe('PreferencesService', () => {
     const loaded = service.loadFilterPreferences();
     expect(loaded).toBeNull();
   });
+
+  it('should handle invalid preferences structure', () => {
+    // Missing required field
+    localStorage.setItem('storm_filter_preferences', JSON.stringify({
+      sortByField: 'Name'
+      // missing sortReverse, searchText, filterState
+    }));
+    let loaded = service.loadFilterPreferences();
+    expect(loaded).toBeNull();
+
+    // Wrong types
+    localStorage.setItem('storm_filter_preferences', JSON.stringify({
+      sortByField: 'Name',
+      sortReverse: 'true', // should be boolean
+      searchText: 'test',
+      filterState: null
+    }));
+    loaded = service.loadFilterPreferences();
+    expect(loaded).toBeNull();
+  });
 });

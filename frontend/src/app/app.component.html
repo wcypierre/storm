@@ -34,7 +34,7 @@
     </div>
 
     <p-dropdown class="t-filter-input" [options]="filterStatesOptions" appendTo="body"
-                [(ngModel)]="filterState" (onChange)="get$.next($event.value)" placeholder="State"></p-dropdown>
+                [(ngModel)]="filterState" (onChange)="onFilterStateChange($event.value)" placeholder="State"></p-dropdown>
   </t-breakpoint-overlay>
 </div>
 

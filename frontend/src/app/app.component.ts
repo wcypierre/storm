@@ -207,6 +207,14 @@ export class AppComponent implements OnDestroy {
     this.savePreferences();
   }
 
+  /**
+   * Update filter state and save preferences
+   */
+  onFilterStateChange(state: OptionalState): void {
+    this.filterState = state;
+    this.get$.next(state);
+  }
+
 
   /**
    * Opens the PluginEnable dialog component
