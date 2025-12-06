@@ -1,6 +1,6 @@
 import {Component, OnDestroy} from '@angular/core';
 import {BehaviorSubject, combineLatest, EMPTY, forkJoin, Observable, of, Subject, timer} from 'rxjs';
-import {catchError, debounceTime, filter, mergeMap, switchMap, takeUntil} from 'rxjs/operators';
+import {catchError, debounceTime, filter, mergeMap, skip, switchMap, takeUntil} from 'rxjs/operators';
 import {ApiService, DiskSpace, Hash, SessionStatus, State, Torrent, ViewTorrent} from './api.service';
 import {SelectItem} from 'primeng/api';
 import {FocusService} from './focus.service';
@@ -126,10 +126,17 @@ export class AppComponent implements OnDestroy {
     // Load preferences from localStorage
     const savedPreferences = this.preferences.loadFilterPreferences();
     if (savedPreferences) {
-      this.sortByField = savedPreferences.sortByField as keyof Torrent;
+      // Validate and set sortByField
+      const validSortField = this.isValidSortField(savedPreferences.sortByField);
+      this.sortByField = validSortField ? savedPreferences.sortByField as keyof Torrent : null;
+      
       this.sortReverse = savedPreferences.sortReverse;
       this.searchText = savedPreferences.searchText;
-      this.filterState = savedPreferences.filterState as OptionalState;
+      
+      // Validate and set filterState
+      const validFilterState = this.isValidFilterState(savedPreferences.filterState);
+      this.filterState = validFilterState ? savedPreferences.filterState as OptionalState : null;
+      
       this.get$ = new BehaviorSubject<OptionalState>(this.filterState);
     } else {
       this.get$ = new BehaviorSubject<OptionalState>(null);
@@ -158,10 +165,39 @@ export class AppComponent implements OnDestroy {
       this.doSavePreferences();
     });
 
-    // Watch for changes to filter state
-    this.get$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+    // Watch for changes to filter state (skip initial value to avoid saving on init)
+    this.get$.pipe(
+      skip(1),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
       this.savePreferences$.next();
     });
+  }
+
+  /**
+   * Validate that a sortByField value is valid
+   */
+  private isValidSortField(field: string | null): boolean {
+    if (field === null) {
+      return true;
+    }
+    const validFields: Array<keyof Torrent> = [
+      'State', 'TimeAdded', 'Progress', 'ETA', 'Name', 'TotalSize', 'Ratio', 'SeedingTime'
+    ];
+    return validFields.includes(field as keyof Torrent);
+  }
+
+  /**
+   * Validate that a filterState value is valid
+   */
+  private isValidFilterState(state: string | null): boolean {
+    if (state === null) {
+      return true;
+    }
+    const validStates: State[] = [
+      'Active', 'Queued', 'Downloading', 'Seeding', 'Paused', 'Error', 'Allocating', 'Checking', 'Moving'
+    ];
+    return validStates.includes(state as State);
   }
 
   /**
@@ -171,7 +207,7 @@ export class AppComponent implements OnDestroy {
     this.preferences.saveFilterPreferences({
       sortByField: this.sortByField,
       sortReverse: this.sortReverse,
-      searchText: this.searchText || '',
+      searchText: this.searchText,
       filterState: this.get$.value
     });
   }
