@@ -13,9 +13,6 @@ export interface FilterPreferences {
 export class PreferencesService {
   private readonly STORAGE_KEY = 'storm_filter_preferences';
 
-  constructor() {
-  }
-
   /**
    * Save filter preferences to localStorage
    */

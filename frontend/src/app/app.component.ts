@@ -19,7 +19,6 @@ type OptionalState = State | null;
 export class AppComponent implements OnDestroy {
   sortByField: keyof Torrent = null;
   sortReverse = false;
-  filterState: OptionalState = null;
 
   private destroy$ = new Subject<void>();
   private savePreferences$ = new Subject<void>();
@@ -135,9 +134,9 @@ export class AppComponent implements OnDestroy {
       
       // Validate and set filterState
       const validFilterState = this.isValidFilterState(savedPreferences.filterState);
-      this.filterState = validFilterState ? savedPreferences.filterState as OptionalState : null;
+      const initialFilterState = validFilterState ? savedPreferences.filterState as OptionalState : null;
       
-      this.get$ = new BehaviorSubject<OptionalState>(this.filterState);
+      this.get$ = new BehaviorSubject<OptionalState>(initialFilterState);
     } else {
       this.get$ = new BehaviorSubject<OptionalState>(null);
     }
@@ -247,7 +246,6 @@ export class AppComponent implements OnDestroy {
    * Update filter state and save preferences
    */
   onFilterStateChange(state: OptionalState): void {
-    this.filterState = state;
     this.get$.next(state);
   }
 
