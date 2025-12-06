@@ -1,6 +1,6 @@
 import {Component, OnDestroy} from '@angular/core';
 import {BehaviorSubject, combineLatest, EMPTY, forkJoin, Observable, of, Subject, timer} from 'rxjs';
-import {catchError, filter, mergeMap, switchMap, takeUntil} from 'rxjs/operators';
+import {catchError, debounceTime, filter, mergeMap, switchMap, takeUntil} from 'rxjs/operators';
 import {ApiService, DiskSpace, Hash, SessionStatus, State, Torrent, ViewTorrent} from './api.service';
 import {SelectItem} from 'primeng/api';
 import {FocusService} from './focus.service';
@@ -22,6 +22,7 @@ export class AppComponent implements OnDestroy {
   filterState: OptionalState = null;
 
   private destroy$ = new Subject<void>();
+  private savePreferences$ = new Subject<void>();
 
   sortOptions: SelectItem<keyof Torrent>[] = [
     {
@@ -89,7 +90,7 @@ export class AppComponent implements OnDestroy {
     }
   ];
 
-  searchText: string;
+  searchText: string = '';
 
   // All torrent hashes within the current view
   hashesInView: string[];
@@ -139,30 +140,47 @@ export class AppComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // Save preferences one last time before destroying
+    this.doSavePreferences();
     this.destroy$.next();
     this.destroy$.complete();
   }
 
   /**
-   * Save preferences whenever they change
+   * Save preferences whenever they change, debounced to reduce localStorage writes
    */
   private setupPreferencesSaving(): void {
+    // Debounce preference saves to reduce localStorage writes
+    this.savePreferences$.pipe(
+      debounceTime(500),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      this.doSavePreferences();
+    });
+
     // Watch for changes to filter state
     this.get$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.savePreferences();
+      this.savePreferences$.next();
     });
   }
 
   /**
-   * Save current preferences to localStorage
+   * Perform the actual save to localStorage
    */
-  private savePreferences(): void {
+  private doSavePreferences(): void {
     this.preferences.saveFilterPreferences({
       sortByField: this.sortByField,
       sortReverse: this.sortReverse,
       searchText: this.searchText || '',
       filterState: this.get$.value
     });
+  }
+
+  /**
+   * Trigger a preferences save
+   */
+  private savePreferences(): void {
+    this.savePreferences$.next();
   }
 
   /**
