@@ -1,11 +1,12 @@
-import {Component} from '@angular/core';
-import {BehaviorSubject, combineLatest, EMPTY, forkJoin, Observable, of, timer} from 'rxjs';
-import {catchError, filter, mergeMap, switchMap} from 'rxjs/operators';
+import {Component, OnDestroy} from '@angular/core';
+import {BehaviorSubject, combineLatest, EMPTY, forkJoin, Observable, of, Subject, timer} from 'rxjs';
+import {catchError, debounceTime, filter, mergeMap, skip, switchMap, takeUntil} from 'rxjs/operators';
 import {ApiService, DiskSpace, Hash, SessionStatus, State, Torrent, ViewTorrent} from './api.service';
 import {SelectItem} from 'primeng/api';
 import {FocusService} from './focus.service';
 import {DialogService} from 'primeng/dynamicdialog';
 import {PluginEnableComponent} from './components/plugin-enable/plugin-enable.component';
+import {PreferencesService} from './preferences.service';
 
 type OptionalState = State | null;
 
@@ -15,9 +16,12 @@ type OptionalState = State | null;
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {
+export class AppComponent implements OnDestroy {
   sortByField: keyof Torrent = null;
   sortReverse = false;
+
+  private destroy$ = new Subject<void>();
+  private savePreferences$ = new Subject<void>();
 
   sortOptions: SelectItem<keyof Torrent>[] = [
     {
@@ -85,7 +89,7 @@ export class AppComponent {
     }
   ];
 
-  searchText: string;
+  searchText: string = '';
 
   // All torrent hashes within the current view
   hashesInView: string[];
@@ -112,9 +116,137 @@ export class AppComponent {
 
   get$: BehaviorSubject<OptionalState>;
 
-  constructor(private api: ApiService, private focus: FocusService, private dialogService: DialogService) {
-    this.get$ = new BehaviorSubject<OptionalState>(null);
+  constructor(
+    private api: ApiService,
+    private focus: FocusService,
+    private dialogService: DialogService,
+    private preferences: PreferencesService
+  ) {
+    // Load preferences from localStorage
+    const savedPreferences = this.preferences.loadFilterPreferences();
+    if (savedPreferences) {
+      // Validate and set sortByField
+      const validSortField = this.isValidSortField(savedPreferences.sortByField);
+      this.sortByField = validSortField ? savedPreferences.sortByField as keyof Torrent : null;
+      
+      this.sortReverse = savedPreferences.sortReverse;
+      this.searchText = savedPreferences.searchText;
+      
+      // Validate and set filterState
+      const validFilterState = this.isValidFilterState(savedPreferences.filterState);
+      const initialFilterState = validFilterState ? savedPreferences.filterState as OptionalState : null;
+      
+      this.get$ = new BehaviorSubject<OptionalState>(initialFilterState);
+    } else {
+      this.get$ = new BehaviorSubject<OptionalState>(null);
+    }
+
     this.refreshInterval(2000);
+    this.setupPreferencesSaving();
+  }
+
+  ngOnDestroy(): void {
+    // Save preferences one last time before destroying
+    this.doSavePreferences();
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Save preferences whenever they change, debounced to reduce localStorage writes
+   */
+  private setupPreferencesSaving(): void {
+    // Debounce preference saves to reduce localStorage writes
+    this.savePreferences$.pipe(
+      debounceTime(500),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      this.doSavePreferences();
+    });
+
+    // Watch for changes to filter state (skip initial value to avoid saving on init)
+    this.get$.pipe(
+      skip(1),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      this.savePreferences$.next();
+    });
+  }
+
+  /**
+   * Validate that a sortByField value is valid
+   */
+  private isValidSortField(field: string | null): boolean {
+    if (field === null) {
+      return true;
+    }
+    const validFields: Array<keyof Torrent> = [
+      'State', 'TimeAdded', 'Progress', 'ETA', 'Name', 'TotalSize', 'Ratio', 'SeedingTime'
+    ];
+    return validFields.includes(field as keyof Torrent);
+  }
+
+  /**
+   * Validate that a filterState value is valid
+   */
+  private isValidFilterState(state: string | null): boolean {
+    if (state === null) {
+      return true;
+    }
+    const validStates: State[] = [
+      'Active', 'Queued', 'Downloading', 'Seeding', 'Paused', 'Error', 'Allocating', 'Checking', 'Moving'
+    ];
+    return validStates.includes(state as State);
+  }
+
+  /**
+   * Perform the actual save to localStorage
+   */
+  private doSavePreferences(): void {
+    this.preferences.saveFilterPreferences({
+      sortByField: this.sortByField,
+      sortReverse: this.sortReverse,
+      searchText: this.searchText,
+      filterState: this.get$.value
+    });
+  }
+
+  /**
+   * Trigger a preferences save
+   */
+  private savePreferences(): void {
+    this.savePreferences$.next();
+  }
+
+  /**
+   * Update sort field and save preferences
+   */
+  onSortFieldChange(field: keyof Torrent): void {
+    this.sortByField = field;
+    this.savePreferences();
+  }
+
+  /**
+   * Toggle sort order and save preferences
+   */
+  onSortReverseToggle(): void {
+    this.sortReverse = !this.sortReverse;
+    this.savePreferences();
+  }
+
+  /**
+   * Update search text and save preferences
+   */
+  onSearchTextChange(text: string): void {
+    this.searchText = text;
+    this.savePreferences();
+  }
+
+  /**
+   * Update filter state and save preferences
+   */
+  onFilterStateChange(state: OptionalState): void {
+    this.get$.next(state);
   }
 
 

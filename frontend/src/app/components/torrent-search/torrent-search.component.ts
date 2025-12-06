@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {AddTorrentMagnetInputComponent} from '../add-torrent-menu/add-torrent-magnet-input/add-torrent-magnet-input.component';
 import {AddTorrentUrlInputComponent} from '../add-torrent-menu/add-torrent-url-input/add-torrent-url-input.component';
 import {DialogService} from 'primeng/dynamicdialog';
@@ -28,8 +28,7 @@ const EntryComponents: { [k: string]: CT | undefined } = {
 })
 export class TorrentSearchComponent {
   @Output('search') search = new EventEmitter<string>();
-
-  searchText: string;
+  @Input('searchText') searchText: string;
   icon: string;
   mode: keyof typeof EntryComponents = 'search';
 
