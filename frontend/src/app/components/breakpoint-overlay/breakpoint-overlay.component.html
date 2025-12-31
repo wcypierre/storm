@@ -13,8 +13,10 @@
 </div>
 
 <ng-template #content>
-  <ng-content>
-  </ng-content>
+  <div class="p-d-flex p-flex-column" [ngClass]="styleClass">
+    <ng-content>
+    </ng-content>
+  </div>
 </ng-template>
 
 
