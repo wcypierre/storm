@@ -1,7 +1,7 @@
 <div *ngIf="$breakpoint | async; else content">
 
   <p-overlayPanel #panel appendTo="body">
-    <div class="p-d-flex p-flex-column" [classList]="styleClass">
+    <div class="p-d-flex p-flex-column" [ngClass]="styleClass">
       <ng-content *ngTemplateOutlet="content">
       </ng-content>
     </div>
@@ -13,8 +13,10 @@
 </div>
 
 <ng-template #content>
-  <ng-content>
-  </ng-content>
+  <div class="p-d-flex p-flex-column" [ngClass]="styleClass">
+    <ng-content>
+    </ng-content>
+  </div>
 </ng-template>
 
 
