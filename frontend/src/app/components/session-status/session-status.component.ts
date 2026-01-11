@@ -12,7 +12,7 @@ export class SessionStatusComponent implements OnInit {
 
   constructor() {
   }
-
+  @Input() torrentCount: number | null = 0;
   ngOnInit(): void {
   }
 
