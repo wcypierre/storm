@@ -21,6 +21,8 @@
 .layout-content {
   padding: 2rem;
   background-color: var(--surface-b);
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 ::ng-deep .t-button-overlay {
@@ -33,7 +35,7 @@
   min-width: 160px;
 
   & .t-sort-option {
-    margin-bottom: 12px;
+    margin-bottom: 0;
   }
 
   & > * {
@@ -53,10 +55,25 @@
     font-size: 0.9rem;
     font-weight: 500;
     text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    max-width: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     & i {
       margin-right: 8px;
       opacity: 0.6;
+      flex-shrink: 0;
+    }
+
+    & span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
     }
   }
 }
@@ -101,17 +118,52 @@ t-breakpoint-overlay {
   align-items: center;
 }
 
+/* Ensure overlay contents line up vertically with menu buttons */
+.p-menubar t-breakpoint-overlay,
+.p-menubar ::ng-deep .t-button-overlay,
+.p-menubar ::ng-deep .t-filter-overlay,
+t-breakpoint-overlay {
+  display: flex;
+  align-items: center;
+}
+
+/* Make filter dropdowns match button height and center their labels */
+.t-filter-input .p-dropdown,
+.t-filter-input .p-dropdown .p-dropdown {
+  min-height: 36px;
+}
+
+.t-filter-input .p-dropdown .p-dropdown-label,
+.t-filter-input .p-dropdown .p-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  height: 36px;
+}
+
+/* Small spacing tweak so the right-aligned overlays visually align with left buttons */
+.t-filter-overlay {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .t-sort-option {
   width: 100%;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
+  align-items: center;
 
 
   ::ng-deep & p-dropdown {
     flex-grow: 1;
     & .p-dropdown {
       border-radius: 4px 0 0 4px;
+      height: 36px;
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
     }
   }
 
@@ -121,8 +173,63 @@ t-breakpoint-overlay {
     border-radius: 0 4px 4px 0;
     border-left: none;
     width: 3rem;
+    height: 36px;
+    padding: 0;
     color: rgba(255, 255, 255, 0.6);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    margin: 0;
   }
+}
+
+/* Strong overrides to ensure PrimeNG dropdown visuals match button height */
+.t-sort-option .p-dropdown,
+.t-sort-option p-dropdown,
+.t-sort-option ::ng-deep .p-dropdown {
+  height: 36px !important;
+  min-height: 36px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+}
+
+.t-sort-option ::ng-deep .p-dropdown .p-dropdown-label,
+.t-sort-option ::ng-deep .p-dropdown .p-dropdown-trigger {
+  height: 36px !important;
+  line-height: 36px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+/* Remove any top margin that might push the sort control up */
+.t-sort-option ::ng-deep .p-dropdown,
+.t-sort-option ::ng-deep .p-dropdown .p-dropdown-label {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Align filter dropdown and sort button heights with menu buttons */
+.p-menubar .t-filter-input {
+  display: flex;
+  align-items: center;
+}
+
+.p-menubar .t-filter-input .p-dropdown,
+.p-menubar .t-filter-input .p-dropdown .p-dropdown-label {
+  height: 36px;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+.p-menubar button.p-button.t-menu-button,
+.p-menubar button.p-button,
+.p-menubar .t-sort-button {
+  height: 36px;
+  line-height: 36px;
 }
 
 .t-bottom-bar {
