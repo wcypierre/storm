@@ -36,11 +36,7 @@
     <p-dropdown class="t-filter-input" [options]="filterStatesOptions" appendTo="body"
                 [ngModel]="get$.value" (onChange)="onFilterStateChange($event.value)" placeholder="State"></p-dropdown>
     
-    <!-- Torrent count: torrents array is already state-filtered by the API, we just apply search filter here -->
-    <div class="t-torrent-count" *ngIf="torrents | torrentSearch: searchText as filteredTorrents">
-      <i class="fas fa-list"></i>
-      <span>{{filteredTorrents.length}} torrent{{filteredTorrents.length !== 1 ? 's' : ''}}</span>
-    </div>
+    <!-- Torrent count moved to footer; keep header clean -->
   </t-breakpoint-overlay>
 </div>
 
@@ -73,7 +69,11 @@
 
 
 <div class="t-bottom-bar">
-  <t-session-status [sessionStatus]="sessionStatus" [diskSpace]="diskSpace"></t-session-status>
+  <t-session-status
+    [sessionStatus]="sessionStatus"
+    [diskSpace]="diskSpace"
+    [torrentCount]="(torrents ? (torrents | torrentSearch: searchText).length : 0)"
+  ></t-session-status>
 </div>
 
 <t-connectivity-status [connected]="connected"></t-connectivity-status>

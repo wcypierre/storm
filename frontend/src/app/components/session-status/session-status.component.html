@@ -6,6 +6,14 @@
 
   <span><i class="fas fa-download"></i>{{sessionStatus.TotalDownload | filesize}}</span>
   <span><i class="fas fa-upload"></i>{{sessionStatus.TotalUpload | filesize}}</span>
+  <span>
+    <i class="fas fa-hdd"></i>
+    <span class="t-disk-free">{{diskSpace?.FreeBytes | filesize}}</span>
+  </span>
 
-  <span><i class="fas fa-hdd"></i>{{diskSpace?.FreeBytes | filesize}}</span>
+  <!-- Moved to the end to keep torrent count as the last footer element -->
+  <span aria-label="Torrents">
+    <i class="fas fa-list t-torrent-icon" aria-hidden="true"></i>
+    <span>{{torrentCount || 0}}</span>
+  </span>
 </div>
