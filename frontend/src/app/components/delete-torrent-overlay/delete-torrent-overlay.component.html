@@ -2,10 +2,12 @@
   <ng-template pTemplate>
       <p-progressSpinner *ngIf="processing"></p-progressSpinner>
       <div *ngIf="!processing" class="p-d-flex p-flex-column">
+        <p-messages [(value)]="errorMessages" *ngIf="errorMessages.length > 0"
+                    [styleClass]="'p-mb-3'" [enableService]="false" [closable]="true"></p-messages>
         <button (click)="onRemove(false)" type="button" pButton pRipple class="p-button t-overlay-button t-button-alt"
-                label="Remove"></button>
+                label="Remove" aria-label="Remove selected torrents"></button>
         <button (click)="onRemove(true)" type="button" pButton pRipple class="p-button p-button-danger t-overlay-button"
-                label="Remove With Data"></button>
+                label="Remove With Data" aria-label="Remove selected torrents and associated data"></button>
       </div>
 
 

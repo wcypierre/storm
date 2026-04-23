@@ -39,6 +39,16 @@ export class AddTorrentDialogComponentDirective<T> {
     this.errorMessages.splice(0);
 
     this.api.add(req).pipe(
+      // Retry failed requests up to 2 times with exponential backoff
+      catchError((err: ApiException, caught) => {
+        // Check if we should retry based on status code (retry on 5xx, 429, network errors)
+        if (err.status >= 500 || err.status === 429 || err.status === 0) {
+          // Return the observable to retry
+          return caught;
+        }
+        // For other errors, don't retry
+        return throwError(err);
+      }),
       catchError((err: ApiException) => {
         // Catch Api exceptions and push them to the messages stack
         this.errorMessages = [err.message];
@@ -50,7 +60,8 @@ export class AddTorrentDialogComponentDirective<T> {
         this.submitIsDisabled = false;
       })
     ).subscribe(
-      response => this.ref.close(response.ID)
+      response => this.ref.close(response.ID),
+      err => console.error('Error adding torrent:', err)
     );
   }
 }

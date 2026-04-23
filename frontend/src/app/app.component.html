@@ -2,7 +2,7 @@
 
   <t-breakpoint-overlay icon="fas fa-bars" styleClass="t-button-overlay">
     <button pButton pRipple (click)="menu.toggle($event)" icon="fas fa-plus" class="t-button-alt"
-            pTooltip="Add Torrent"></button>
+            pTooltip="Add Torrent" aria-label="Add new torrent"></button>
     <t-add-torrent-menu #menu></t-add-torrent-menu>
 
     <button pButton pRipple type="button" class="t-menu-button"
@@ -10,14 +10,15 @@
             [disabled]="empty"
             [pTooltip]="stateInView == 'Paused' ? 'Resume' : 'Pause'"
             [icon]="stateInView === 'Paused' ? 'fas fa-play' : 'fas fa-pause'"
+            [attr.aria-label]="stateInView === 'Paused' ? 'Resume all torrents' : 'Pause all torrents'"
     ></button>
 
     <t-delete-torrent-overlay #remove [torrents]="hashesInView"></t-delete-torrent-overlay>
     <button pButton pRipple (click)="remove.toggle($event)" type="button" icon="far fa-trash-alt"
             [disabled]="empty"
-
             class="p-button-danger t-menu-button"
-            pTooltip="Remove Displayed"></button>
+            pTooltip="Remove Displayed"
+            aria-label="Remove all displayed torrents"></button>
   </t-breakpoint-overlay>
 
 
