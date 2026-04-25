@@ -12,6 +12,9 @@ on:
       - master
       - develop
 
+permissions:
+  contents: read
+
 jobs:
   frontend-lint:
     name: Frontend Lint
@@ -19,10 +22,10 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: '18'
+          node-version: '24'
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: |
@@ -37,10 +40,10 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: '18'
+          node-version: '24'
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: |
@@ -55,10 +58,10 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: '18'
+          node-version: '24'
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: |
@@ -66,7 +69,7 @@ jobs:
           npm install --legacy-peer-deps
           npm run build:prod
         continue-on-error: true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: frontend-dist-ci
           path: frontend/dist/
@@ -78,10 +81,10 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: '18'
+          node-version: '24'
       - run: |
           cd frontend
           npm install --legacy-peer-deps
