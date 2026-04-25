@@ -1,6 +1,10 @@
+<p-messages [(value)]="errorMessages" *ngIf="errorMessages.length > 0"
+            [styleClass]="'p-mb-3'" [enableService]="false" [closable]="true"></p-messages>
+
 <p>The Deluge plugin <b>{{name}}</b> must be enabled to continue</p>
 
 <div class="p-d-flex p-flex-row p-justify-between">
   <button pButton [label]="inProgress ? 'Enabling...' : 'Enable'" type="button" [disabled]="inProgress"
-          (click)="onSubmit()" class="p-button-success"></button>
+          (click)="onSubmit()" class="p-button-success"
+          [attr.aria-label]="'Enable ' + name + ' plugin'"></button>
 </div>

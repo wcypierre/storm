@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import {DynamicDialogConfig, DynamicDialogRef} from "primeng/dynamicdialog";
-import {ApiService} from "../../api.service";
+import {ApiException, ApiService} from "../../api.service";
+import {catchError, finalize, retry} from 'rxjs/operators';
+import {throwError} from 'rxjs';
+import {Message} from 'primeng/api';
 
 @Component({
   selector: 't-plugin-enable',
@@ -11,6 +14,9 @@ export class PluginEnableComponent implements OnInit {
   name: string;
 
   inProgress: boolean = false;
+  errorMessages: Message[] = [];
+  retryCount: number = 0;
+  maxRetries: number = 2;
 
   constructor(private ref: DynamicDialogRef, private config: DynamicDialogConfig, private api: ApiService) {
     this.name = config.data.name;
@@ -21,12 +27,27 @@ export class PluginEnableComponent implements OnInit {
 
   onSubmit(): void {
     this.inProgress = true;
-    this.api.enablePlugin(this.name).subscribe(
-      _ => {
+    this.errorMessages = [];
+
+    this.api.enablePlugin(this.name).pipe(
+      retry(this.maxRetries),
+      finalize(() => {
         this.inProgress = false;
+      }),
+      catchError((err: ApiException) => {
+        this.errorMessages = [{
+          severity: 'error',
+          summary: 'Failed to enable plugin',
+          detail: err.error
+        }];
+        return throwError(err);
+      })
+    ).subscribe(
+      _ => {
         this.ref.close(true);
       },
-    )
+      err => console.error('Error enabling plugin:', err)
+    );
   }
 
 }

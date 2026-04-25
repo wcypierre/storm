@@ -1,8 +1,9 @@
 import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
-import {ApiService} from '../../api.service';
+import {ApiException, ApiService} from '../../api.service';
 import {OverlayPanel} from 'primeng/overlaypanel';
-import {finalize, mergeMap} from 'rxjs/operators';
-import {from} from 'rxjs';
+import {catchError, finalize, mergeMap, retry} from 'rxjs/operators';
+import {from, throwError} from 'rxjs';
+import {Message} from 'primeng/api';
 
 @Component({
   selector: 't-delete-torrent-overlay',
@@ -13,11 +14,10 @@ export class DeleteTorrentOverlayComponent {
   @Input('torrents') torrents: string[];
   @Output('removed') removed = new EventEmitter<boolean>();
 
-
   @ViewChild('overlay') overlay: OverlayPanel;
 
-
   processing = false;
+  errorMessages: Message[] = [];
 
   constructor(private api: ApiService) {
   }
@@ -28,16 +28,30 @@ export class DeleteTorrentOverlayComponent {
 
   onRemove(withData: boolean): void {
     this.processing = true;
+    this.errorMessages = [];
 
     from(this.torrents).pipe(
-      mergeMap(hash => this.api.removeTorrent(withData, hash)),
+      mergeMap(hash => this.api.removeTorrent(withData, hash).pipe(
+        retry(2),
+        catchError((err: ApiException) => {
+          this.errorMessages.push({
+            severity: 'error',
+            summary: 'Failed to remove torrent',
+            detail: err.error
+          });
+          return throwError(err);
+        })
+      )),
       finalize(() => {
         this.processing = false;
-        this.overlay.hide();
+        if (this.errorMessages.length === 0) {
+          this.overlay.hide();
+        }
         this.removed.emit(true);
       })
     ).subscribe(
       _ => console.log('torrent deleted'),
+      err => console.error('Error removing torrents:', err)
     );
   }
 }
