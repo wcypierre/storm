@@ -1,5 +1,5 @@
-<p-messages [(value)]="errorMessages" *ngIf="errorMessages.length > 0"
-            [styleClass]="'p-mb-3'" [enableService]="false" [closable]="true"></p-messages>
+<p-message *ngFor="let msg of errorMessages" [severity]="msg.severity" [text]="msg.detail"
+            [styleClass]="'p-mb-3'"></p-message>
 
 <p>The Deluge plugin <b>{{name}}</b> must be enabled to continue</p>
 

@@ -1,11 +1,11 @@
 <div *ngIf="$breakpoint | async; else content">
 
-  <p-overlayPanel #panel appendTo="body">
+  <p-popover #panel appendTo="body">
     <div class="p-d-flex p-flex-column" [ngClass]="styleClass">
       <ng-content *ngTemplateOutlet="content">
       </ng-content>
     </div>
-  </p-overlayPanel>
+  </p-popover>
 
 
   <button pButton pRipple (click)="panel.toggle($event)" type="button" [icon]="icon"></button>

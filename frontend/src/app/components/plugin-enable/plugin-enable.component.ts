@@ -3,7 +3,7 @@ import {DynamicDialogConfig, DynamicDialogRef} from "primeng/dynamicdialog";
 import {ApiException, ApiService} from "../../api.service";
 import {catchError, finalize, retry} from 'rxjs/operators';
 import {throwError} from 'rxjs';
-import {Message} from 'primeng/api';
+import {ToastMessageOptions as Message} from 'primeng/api';
 
 @Component({
   selector: 't-plugin-enable',

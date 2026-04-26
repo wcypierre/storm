@@ -10,7 +10,7 @@ import {
   HttpRequest
 } from '@angular/common/http';
 import {catchError, retryWhen, switchMap, takeWhile} from 'rxjs/operators';
-import {Message} from 'primeng/api';
+import {ToastMessageOptions as Message} from 'primeng/api';
 import {Environment, ENVIRONMENT} from './environment';
 import {DialogService} from 'primeng/dynamicdialog';
 import {ApiKeyDialogComponent} from './components/api-key-dialog/api-key-dialog.component';
