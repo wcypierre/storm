@@ -6,6 +6,7 @@ import {from, throwError} from 'rxjs';
 import {ToastMessageOptions as Message} from 'primeng/api';
 
 @Component({
+  standalone: false,
   selector: 't-delete-torrent-overlay',
   templateUrl: './delete-torrent-overlay.component.html',
   styleUrls: ['./delete-torrent-overlay.component.scss']

@@ -22,6 +22,7 @@ const EntryComponents: { [k: string]: CT | undefined } = {
 };
 
 @Component({
+  standalone: false,
   selector: 't-torrent-search',
   templateUrl: './torrent-search.component.html',
   styleUrls: ['./torrent-search.component.scss']

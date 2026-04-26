@@ -7,6 +7,7 @@ import {AddTorrentUrlInputComponent} from './add-torrent-url-input/add-torrent-u
 import {AddTorrentFileInputComponent} from './add-torrent-file-input/add-torrent-file-input.component';
 
 @Component({
+  standalone: false,
   selector: 't-add-torrent-menu',
   templateUrl: './add-torrent-menu.component.html',
   styleUrls: ['./add-torrent-menu.component.scss'],

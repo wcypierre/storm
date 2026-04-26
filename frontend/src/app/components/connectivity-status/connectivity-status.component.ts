@@ -3,6 +3,7 @@ import {concat, Observable, of, Subject, timer} from 'rxjs';
 import {map, switchMap, tap} from 'rxjs/operators';
 
 @Component({
+  standalone: false,
   selector: 't-connectivity-status',
   templateUrl: './connectivity-status.component.html',
   styleUrls: ['./connectivity-status.component.scss']

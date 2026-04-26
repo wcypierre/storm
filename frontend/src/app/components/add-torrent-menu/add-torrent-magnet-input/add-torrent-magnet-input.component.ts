@@ -6,6 +6,7 @@ export interface MagnetInput {
 }
 
 @Component({
+  standalone: false,
   selector: 't-add-torrent-magnet-input',
   templateUrl: './add-torrent-magnet-input.component.html',
   styleUrls: ['./add-torrent-magnet-input.component.scss']

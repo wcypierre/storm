@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 
 @Component({
+  standalone: false,
   selector: 't-breakpoint-overlay',
   templateUrl: './breakpoint-overlay.component.html',
   styleUrls: ['./breakpoint-overlay.component.scss']

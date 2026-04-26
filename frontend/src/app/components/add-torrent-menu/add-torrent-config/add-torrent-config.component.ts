@@ -2,6 +2,7 @@ import {Component, Input} from '@angular/core';
 import {TorrentOptions} from '../../../api.service';
 
 @Component({
+  standalone: false,
   selector: 't-add-torrent-config',
   templateUrl: './add-torrent-config.component.html',
   styleUrls: ['./add-torrent-config.component.scss']

@@ -2,6 +2,7 @@ import {Component, Injector} from '@angular/core';
 import {AddTorrentDialogComponentDirective} from '../add-torrent-dialog-component';
 
 @Component({
+  standalone: false,
   selector: 't-add-torrent-file-input',
   templateUrl: './add-torrent-file-input.component.html',
   styleUrls: ['./add-torrent-file-input.component.scss']

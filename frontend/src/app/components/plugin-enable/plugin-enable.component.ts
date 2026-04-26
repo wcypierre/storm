@@ -6,6 +6,7 @@ import {throwError} from 'rxjs';
 import {ToastMessageOptions as Message} from 'primeng/api';
 
 @Component({
+  standalone: false,
   selector: 't-plugin-enable',
   templateUrl: './plugin-enable.component.html',
   styleUrls: ['./plugin-enable.component.scss']
