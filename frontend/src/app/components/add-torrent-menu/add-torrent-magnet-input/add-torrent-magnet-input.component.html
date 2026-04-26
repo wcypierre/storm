@@ -7,7 +7,7 @@
 
 <p-message *ngFor="let msg of errorMessages" [severity]="msg.severity" [text]="msg.detail"></p-message>
 
-<div class="p-d-flex p-flex-row p-justify-between">
+<div class="flex flex-row justify-content-between">
   <button pButton label="Add" [icon]="submitIcon" [disabled]="submitIsDisabled" (click)="onSubmit()"></button>
   <button pButton class="p-button-danger" label="Cancel" icon="fas fa-times" (click)="close()"></button>
 </div>

@@ -13,15 +13,15 @@
 </ng-template>
 
 
-<div class="p-grid p-fluid">
-  <div class="p-field p-col-12">
+<div class="grid p-fluid">
+  <div class="field col-12">
     <input pInputText autofocus [(ngModel)]="label" (ngModelChange)="query$.next($event)"
            placeholder="Start typing a new label">
   </div>
 
-  <div class="p-col-12">
+  <div class="col-12">
     <button *ngFor="let suggestion of suggestions$ | async"
-            class="p-button p-component p-d-flex p-flex-row p-justify-between t-suggestion-button" type="button"
+            class="p-button p-component flex flex-row justify-content-between t-suggestion-button" type="button"
             (click)="onApplySuggestion(suggestion)">
       <ng-container
         [ngTemplateOutlet]="suggestion.new ? createNewLabel : suggestion.clear ? clearCurrentLabel : useExistingLabel"
