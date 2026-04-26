@@ -4,8 +4,8 @@
 
 <div class="p-card p-component">
   <div class="p-card-body">
-    <div class="p-d-flex p-flex-column p-flex-md-row" style="padding: 0">
-      <div class="p-d-flex p-flex-column p-md-8">
+    <div class="flex flex-column md:flex-row" style="padding: 0">
+      <div class="flex flex-column md:col-8">
         <div class="p-card-title">
           {{torrent.Name}}
         </div>
@@ -18,8 +18,8 @@
 
     </div>
 
-    <div class="p-d-flex p-flex-column t-bar p-col-12">
-      <div class="p-d-flex p-flex-row p-align-center t-torrent-progress">
+    <div class="flex flex-column t-bar col-12">
+      <div class="flex flex-row align-items-center t-torrent-progress">
         <span pTooltip="ETA">
           <i class="far fa-clock"></i>
           <ng-container *ngIf="torrent.ETA else torrentInfinite">
@@ -39,8 +39,8 @@
       </p-progressBar>
     </div>
 
-    <div class="p-d-flex p-flex-row p-justify-between t-details">
-      <div class="t-info p-d-flex p-flex-row p-flex-wrap">
+    <div class="flex flex-row justify-content-between t-details">
+      <div class="t-info flex flex-row flex-wrap">
         <span pTooltip="Download speed">
           <i class="fas fa-download"></i>
           {{torrent.DownloadPayloadRate |filesize}}s

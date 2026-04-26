@@ -12,6 +12,9 @@
     "importHelpers": true,
     "target": "es2022",
     "module": "es2022",
+    "ignoreDeprecations": "6.0",
+    "strictPropertyInitialization": false,
+    "strictNullChecks": false,
     "lib": [
       "es2022",
       "dom"

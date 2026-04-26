@@ -42,7 +42,7 @@ export class AddTorrentMenuComponent {
   constructor(private dialogService: DialogService) {
   }
 
-  public toggle($event): void {
+  public toggle($event: MouseEvent): void {
     this.menu.toggle($event);
   }
 

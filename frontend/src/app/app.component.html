@@ -1,4 +1,4 @@
-<div class="p-menubar p-d-flex p-flex-row p-align-center p-justify-between p-flex-nowrap">
+<div class="p-menubar flex flex-row align-items-center justify-content-between flex-nowrap">
 
   <t-breakpoint-overlay icon="fas fa-bars" styleClass="t-button-overlay">
     <button pButton pRipple (click)="menu.toggle($event)" icon="fas fa-plus" class="t-button-alt"
@@ -36,20 +36,20 @@
 
     <p-dropdown class="t-filter-input" [options]="filterStatesOptions" appendTo="body"
                 [ngModel]="get$.value" (onChange)="onFilterStateChange($event.value)" placeholder="State"></p-dropdown>
-    
+
     <!-- Torrent count moved to footer; keep header clean -->
   </t-breakpoint-overlay>
 </div>
 
 
 <ng-template #displayNotLoaded>
-  <div class="t-empty p-d-flex p-flex-column p-justify-center p-align-center">
+  <div class="t-empty flex flex-column justify-content-center align-items-center">
     <i class="fas fa-circle-notch fa-spin"></i>
   </div>
 </ng-template>
 
 <ng-template #displayEmpty>
-  <div class="t-empty p-d-flex p-flex-column p-justify-center p-align-center">
+  <div class="t-empty flex flex-column justify-content-center align-items-center">
     <i class="fas fa-cloud-moon"></i>
     <span>No Torrents</span>
   </div>
@@ -57,8 +57,8 @@
 
 <ng-container *ngIf="torrents | torrentSearch: searchText as result; else displayNotLoaded">
   <div class="layout-content">
-    <div class="p-grid">
-      <div class="p-col-12"
+    <div class="grid">
+      <div class="col-12"
            *ngFor="let item of result | orderBy: sortByField : sortReverse ; trackBy: trackBy">
         <t-torrent [torrent]="item" [hash]="item.Hash" [label]="item.Label"></t-torrent>
       </div>
@@ -78,4 +78,3 @@
 </div>
 
 <t-connectivity-status [connected]="connected"></t-connectivity-status>
-

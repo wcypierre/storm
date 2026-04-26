@@ -7,7 +7,7 @@ WORKDIR /go/src/storm
 
 COPY . .
 
-RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -ldflags="-s -w" github.com/relvacode/storm/cmd/storm
+RUN go mod download && GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -ldflags="-s -w" github.com/relvacode/storm/cmd/storm
 
 
 FROM --platform=${TARGETPLATFORM} alpine

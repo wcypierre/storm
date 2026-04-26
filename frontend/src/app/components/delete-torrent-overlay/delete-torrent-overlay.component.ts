@@ -23,8 +23,8 @@ export class DeleteTorrentOverlayComponent {
   constructor(private api: ApiService) {
   }
 
-  public toggle($event): void {
-    this.overlay.toggle($event, $event.target);
+  public toggle($event: MouseEvent): void {
+    this.overlay.toggle($event, $event.target as HTMLElement);
   }
 
   onRemove(withData: boolean): void {
