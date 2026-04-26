@@ -12,10 +12,10 @@ import {RippleModule} from 'primeng/ripple';
 import {TooltipModule} from 'primeng/tooltip';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {ApiInterceptor, AuthInterceptor} from './api.service';
-import {DropdownModule} from 'primeng/dropdown';
+import {SelectModule} from 'primeng/select';
 import {OrderByPipe} from './order-by.pipe';
 import {FormsModule} from '@angular/forms';
-import {OverlayPanelModule} from 'primeng/overlaypanel';
+import {PopoverModule} from 'primeng/popover';
 import {DeleteTorrentOverlayComponent} from './components/delete-torrent-overlay/delete-torrent-overlay.component';
 import {ProgressSpinnerModule} from 'primeng/progressspinner';
 import {MomentModule} from 'ngx-moment';
@@ -34,7 +34,7 @@ import {TorrentDetailsDialogComponent} from './components/torrent-details-dialog
 import {
   AddTorrentUrlInputComponent
 } from './components/add-torrent-menu/add-torrent-url-input/add-torrent-url-input.component';
-import {MessagesModule} from 'primeng/messages';
+import {MessageModule} from 'primeng/message';
 import {
   AddTorrentFileInputComponent
 } from './components/add-torrent-menu/add-torrent-file-input/add-torrent-file-input.component';
@@ -90,9 +90,9 @@ import { SessionStatusComponent } from './components/session-status/session-stat
     ButtonModule,
     RippleModule,
     TooltipModule,
-    DropdownModule,
+    SelectModule,
     FormsModule,
-    OverlayPanelModule,
+    PopoverModule,
     ProgressSpinnerModule,
     DynamicDialogModule,
     MomentModule,
@@ -100,7 +100,7 @@ import { SessionStatusComponent } from './components/session-status/session-stat
     AccordionModule,
     InputNumberModule,
     CheckboxModule,
-    MessagesModule,
+    MessageModule,
     FileUploadModule,
     MultiSelectModule,
   ],

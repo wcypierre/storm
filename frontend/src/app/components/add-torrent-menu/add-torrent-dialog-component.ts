@@ -3,7 +3,7 @@ import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {Injector} from '@angular/core';
 import {catchError, finalize} from 'rxjs/operators';
 import {throwError} from 'rxjs';
-import {Message} from 'primeng/api';
+import {ToastMessageOptions as Message} from 'primeng/api';
 
 export class AddTorrentDialogComponentDirective<T> {
   public static DefaultIcon = 'far fa-plus-square';

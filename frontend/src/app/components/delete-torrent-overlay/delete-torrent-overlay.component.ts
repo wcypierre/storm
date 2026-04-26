@@ -1,9 +1,9 @@
 import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {ApiException, ApiService} from '../../api.service';
-import {OverlayPanel} from 'primeng/overlaypanel';
+import {Popover} from 'primeng/popover';
 import {catchError, finalize, mergeMap, retry} from 'rxjs/operators';
 import {from, throwError} from 'rxjs';
-import {Message} from 'primeng/api';
+import {ToastMessageOptions as Message} from 'primeng/api';
 
 @Component({
   selector: 't-delete-torrent-overlay',
@@ -14,7 +14,7 @@ export class DeleteTorrentOverlayComponent {
   @Input('torrents') torrents: string[];
   @Output('removed') removed = new EventEmitter<boolean>();
 
-  @ViewChild('overlay') overlay: OverlayPanel;
+  @ViewChild('overlay') overlay: Popover;
 
   processing = false;
   errorMessages: Message[] = [];

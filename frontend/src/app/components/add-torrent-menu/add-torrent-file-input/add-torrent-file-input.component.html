@@ -6,6 +6,6 @@
 
 <t-add-torrent-config [config]="config"></t-add-torrent-config>
 
-<p-messages [(value)]="errorMessages"></p-messages>
+<p-message *ngFor="let msg of errorMessages" [severity]="msg.severity" [text]="msg.detail"></p-message>
 
 <button pButton class="p-button-danger" label="Cancel" icon="fas fa-times" (click)="close()"></button>
