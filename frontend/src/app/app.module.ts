@@ -104,7 +104,6 @@ import { SessionStatusComponent } from './components/session-status/session-stat
     FileUploadModule,
     MultiSelectModule,
   ],
-  entryComponents: [],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
