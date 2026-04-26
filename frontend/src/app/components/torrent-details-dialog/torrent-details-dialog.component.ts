@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 import {DialogService, DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 
 @Component({
+  standalone: false,
   selector: 't-torrent-details-dialog',
   templateUrl: './torrent-details-dialog.component.html',
   styleUrls: ['./torrent-details-dialog.component.scss']

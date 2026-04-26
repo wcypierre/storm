@@ -4,6 +4,7 @@ import {Label, Torrent} from './api.service';
 type LabelledTorrent = Label & Torrent;
 
 @Pipe({
+  standalone: false,
   name: 'torrentSearch'
 })
 export class TorrentSearchPipe implements PipeTransform {

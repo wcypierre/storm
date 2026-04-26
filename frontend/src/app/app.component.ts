@@ -12,6 +12,7 @@ type OptionalState = State | null;
 
 
 @Component({
+  standalone: false,
   selector: 't-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],

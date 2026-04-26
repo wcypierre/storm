@@ -6,6 +6,7 @@ export interface URLInput {
 }
 
 @Component({
+  standalone: false,
   selector: 't-add-torrent-url-input',
   templateUrl: './add-torrent-url-input.component.html',
   styleUrls: ['./add-torrent-url-input.component.scss']

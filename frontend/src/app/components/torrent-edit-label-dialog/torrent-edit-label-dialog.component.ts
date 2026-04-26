@@ -11,6 +11,7 @@ interface LabelSuggestion {
 }
 
 @Component({
+  standalone: false,
   selector: 't-torrent-edit-label-dialog',
   templateUrl: './torrent-edit-label-dialog.component.html',
   styleUrls: ['./torrent-edit-label-dialog.component.scss']

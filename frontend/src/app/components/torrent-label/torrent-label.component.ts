@@ -2,6 +2,7 @@ import {Component, Input} from '@angular/core';
 import {TorrentEditLabelService} from "../torrent-edit-label-dialog/torrent-edit-label-dialog.component";
 
 @Component({
+  standalone: false,
   selector: 't-torrent-label',
   templateUrl: './torrent-label.component.html',
   styleUrls: ['./torrent-label.component.scss']

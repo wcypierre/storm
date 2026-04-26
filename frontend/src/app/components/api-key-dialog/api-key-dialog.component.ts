@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import {DynamicDialogRef} from "primeng/dynamicdialog";
 
 @Component({
+  standalone: false,
   selector: 't-api-key-dialog',
   templateUrl: './api-key-dialog.component.html',
   styleUrls: ['./api-key-dialog.component.scss']

@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {DiskSpace, SessionStatus} from '../../api.service';
 
 @Component({
+  standalone: false,
   selector: 't-session-status',
   templateUrl: './session-status.component.html',
   styleUrls: ['./session-status.component.scss']

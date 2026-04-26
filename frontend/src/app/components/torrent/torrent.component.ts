@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 import {switchMap, take} from 'rxjs/operators';
 
 @Component({
+  standalone: false,
   selector: 't-torrent',
   templateUrl: './torrent.component.html',
   styleUrls: ['./torrent.component.scss']
