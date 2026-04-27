@@ -289,6 +289,10 @@ export class AppComponent implements OnDestroy {
         }
 
         return this.enableLabelPlugin();
+      }),
+      catchError(err => {
+        console.error('Plugin check failed, proceeding without Label plugin', err);
+        return of(false);
       })
     );
 
@@ -312,7 +316,7 @@ export class AppComponent implements OnDestroy {
         this.connected = true;
         this.sessionStatus = response.Session;
         this.diskSpace = {FreeBytes: response.DiskFree};
-        this.torrents = response.Torrents;
+        this.torrents = response.Torrents ?? [];
 
         this.empty = this.torrents.length === 0;
         this.hashesInView = this.torrents.map(t => t.Hash);
