@@ -14,8 +14,9 @@
 <!--AddPaused?: boolean;-->
 
 <p-accordion>
-  <p-accordionTab header="Torrent Options" [selected]="false">
-    <ng-template pTemplate="content">
+  <p-accordion-panel value="0">
+    <p-accordion-header>Torrent Options</p-accordion-header>
+    <p-accordion-content>
       <div class="grid p-fluid">
         <div class="field col-12 md:col-3">
           <label for="o-maxDownloadSpeed">Max Download Speed</label>
@@ -109,7 +110,6 @@
         </div>
 
       </div>
-    </ng-template>
-
-  </p-accordionTab>
+    </p-accordion-content>
+  </p-accordion-panel>
 </p-accordion>
