@@ -41,7 +41,7 @@
   & > * {
     width: 100%;
 
-    & .p-dropdown {
+    & .p-select {
       width: 100%;
     }
   }
@@ -83,7 +83,7 @@
   .p-menubar {
     padding: .5rem;
 
-    & p-dropdown:not(:first-child) {
+    & p-select:not(:first-child) {
       margin-left: 6px;
     }
   }
@@ -128,13 +128,13 @@ t-breakpoint-overlay {
 }
 
 /* Make filter dropdowns match button height and center their labels */
-.t-filter-input .p-dropdown,
-.t-filter-input .p-dropdown .p-dropdown {
+.t-filter-input .p-select,
+.t-filter-input .p-select .p-select {
   min-height: 36px;
 }
 
-.t-filter-input .p-dropdown .p-dropdown-label,
-.t-filter-input .p-dropdown .p-dropdown-trigger {
+.t-filter-input .p-select .p-select-label,
+.t-filter-input .p-select .p-select-dropdown {
   display: flex;
   align-items: center;
   height: 36px;
@@ -155,9 +155,9 @@ t-breakpoint-overlay {
   align-items: center;
 
 
-  ::ng-deep & p-dropdown {
+  ::ng-deep & p-select {
     flex-grow: 1;
-    & .p-dropdown {
+    & .p-select {
       border-radius: 4px 0 0 4px;
       height: 36px;
       min-height: 36px;
@@ -184,10 +184,10 @@ t-breakpoint-overlay {
   }
 }
 
-/* Strong overrides to ensure PrimeNG dropdown visuals match button height */
-.t-sort-option .p-dropdown,
-.t-sort-option p-dropdown,
-.t-sort-option ::ng-deep .p-dropdown {
+/* Strong overrides to ensure PrimeNG select visuals match button height */
+.t-sort-option .p-select,
+.t-sort-option p-select,
+.t-sort-option ::ng-deep .p-select {
   height: 36px !important;
   min-height: 36px !important;
   display: inline-flex !important;
@@ -195,8 +195,8 @@ t-breakpoint-overlay {
   box-sizing: border-box !important;
 }
 
-.t-sort-option ::ng-deep .p-dropdown .p-dropdown-label,
-.t-sort-option ::ng-deep .p-dropdown .p-dropdown-trigger {
+.t-sort-option ::ng-deep .p-select .p-select-label,
+.t-sort-option ::ng-deep .p-select .p-select-dropdown {
   height: 36px !important;
   line-height: 36px !important;
   display: inline-flex !important;
@@ -204,8 +204,8 @@ t-breakpoint-overlay {
 }
 
 /* Remove any top margin that might push the sort control up */
-.t-sort-option ::ng-deep .p-dropdown,
-.t-sort-option ::ng-deep .p-dropdown .p-dropdown-label {
+.t-sort-option ::ng-deep .p-select,
+.t-sort-option ::ng-deep .p-select .p-select-label {
   margin-top: 0 !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
@@ -217,8 +217,8 @@ t-breakpoint-overlay {
   align-items: center;
 }
 
-.p-menubar .t-filter-input .p-dropdown,
-.p-menubar .t-filter-input .p-dropdown .p-dropdown-label {
+.p-menubar .t-filter-input .p-select,
+.p-menubar .t-filter-input .p-select .p-select-label {
   height: 36px;
   min-height: 36px;
   display: flex;
