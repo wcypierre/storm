@@ -57,11 +57,12 @@ func (nullTimer) Stop() bool {
 	return true
 }
 
-func NewConnectionPool(log *zap.Logger, maxConnections int, idleConnectionTime time.Duration, provider DelugeProvider) *ConnectionPool {
+func NewConnectionPool(log *zap.Logger, maxConnections int, idleConnectionTime time.Duration, connectTimeout time.Duration, provider DelugeProvider) *ConnectionPool {
 	pool := &ConnectionPool{
 		Log:                log,
 		MaxConnections:     maxConnections,
 		IdleConnectionTime: idleConnectionTime,
+		ConnectTimeout:     connectTimeout,
 		Provider:           provider,
 
 		get:   make(chan *poolReq),
@@ -79,6 +80,7 @@ type ConnectionPool struct {
 	Log                *zap.Logger
 	MaxConnections     int
 	IdleConnectionTime time.Duration
+	ConnectTimeout     time.Duration
 	Provider           DelugeProvider
 
 	get   chan *poolReq
@@ -209,13 +211,38 @@ func (pool *ConnectionPool) getConn(req *poolReq) {
 		return
 	}
 
-	// A new connection can be established
-	conn := pool.Provider()
+	// A new connection can be established.
+	// Connect() is run in a goroutine so the pool worker is not blocked indefinitely
+	// if the TCP dial times out (e.g. IPv6 unreachable with no RST on Go 1.21+ DNS changes).
+	newConn := pool.Provider()
 
-	err := conn.Connect()
-	if err != nil {
-		pool.Log.Error("Failed to establish Deluge RPC connection", zap.Error(err))
-		conn = nil
+	type connectResult struct {
+		err error
+	}
+	connectCh := make(chan connectResult, 1)
+	go func() { connectCh <- connectResult{newConn.Connect()} }()
+
+	var timeout <-chan time.Time
+	if pool.ConnectTimeout > 0 {
+		t := time.NewTimer(pool.ConnectTimeout)
+		defer t.Stop()
+		timeout = t.C
+	}
+
+	var conn deluge.DelugeClient
+	select {
+	case r := <-connectCh:
+		if r.err != nil {
+			pool.Log.Error("Failed to establish Deluge RPC connection", zap.Error(r.err))
+		} else {
+			conn = newConn
+		}
+	case <-timeout:
+		pool.Log.Error("Timed out establishing Deluge RPC connection", zap.Duration("timeout", pool.ConnectTimeout))
+		go func() { <-connectCh; newConn.Close() }()
+	case <-req.ctx.Done():
+		go func() { <-connectCh; newConn.Close() }()
+		return
 	}
 
 	ok := req.Send(conn)
