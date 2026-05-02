@@ -74,18 +74,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "storm:build"
+            "buildTarget": "storm:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "storm:build:production"
+              "buildTarget": "storm:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "storm:build"
+            "buildTarget": "storm:build"
           }
         },
         "test": {
