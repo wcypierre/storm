@@ -1,7 +1,8 @@
-import {Component, OnDestroy} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy} from '@angular/core';
 import {BehaviorSubject, combineLatest, EMPTY, forkJoin, Observable, of, Subject, timer} from 'rxjs';
-import {catchError, debounceTime, filter, mergeMap, skip, switchMap, takeUntil} from 'rxjs/operators';
+import {catchError, debounceTime, filter, skip, switchMap, takeUntil} from 'rxjs/operators';
 import {ApiService, DiskSpace, Hash, SessionStatus, State, Torrent, ViewTorrent} from './api.service';
+import {TorrentSearchPipe} from './torrent-search.pipe';
 import {SelectItem} from 'primeng/api';
 import {FocusService} from './focus.service';
 import {DialogService} from 'primeng/dynamicdialog';
@@ -16,6 +17,7 @@ type OptionalState = State | null;
   selector: 't-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnDestroy {
   sortByField: keyof Torrent = null;
@@ -111,9 +113,12 @@ export class AppComponent implements OnDestroy {
   diskSpace: DiskSpace;
 
   torrents: ViewTorrent[];
+  filteredCount = 0;
 
   connected = true;
   lastEtag: string;
+
+  private readonly searchPipe = new TorrentSearchPipe();
 
   get$: BehaviorSubject<OptionalState>;
 
@@ -121,7 +126,8 @@ export class AppComponent implements OnDestroy {
     private api: ApiService,
     private focus: FocusService,
     private dialogService: DialogService,
-    private preferences: PreferencesService
+    private preferences: PreferencesService,
+    private cdr: ChangeDetectorRef,
   ) {
     // Load preferences from localStorage
     const savedPreferences = this.preferences.loadFilterPreferences();
@@ -240,7 +246,13 @@ export class AppComponent implements OnDestroy {
    */
   onSearchTextChange(text: string): void {
     this.searchText = text;
+    this.updateFilteredCount();
+    this.cdr.markForCheck();
     this.savePreferences();
+  }
+
+  private updateFilteredCount(): void {
+    this.filteredCount = this.searchPipe.transform(this.torrents ?? [], this.searchText).length;
   }
 
   /**
@@ -302,8 +314,8 @@ export class AppComponent implements OnDestroy {
       // Continue only when in focus
       filter(([_, focus]) => focus),
 
-      // Switch to API response of torrents
-      mergeMap(([_, focus, state]) => this.api.viewUpdate(this.lastEtag, state).pipe(
+      // Switch to API response of torrents, cancelling any in-flight request
+      switchMap(([_, focus, state]) => this.api.viewUpdate(this.lastEtag, state).pipe(
         catchError(err => {
           console.error('Connection error', err);
           this.connected = false;
@@ -325,6 +337,9 @@ export class AppComponent implements OnDestroy {
         const statesInView = new Set(this.torrents.map(t => t.State));
         const [onlyStateInView] = statesInView.size === 1 ? statesInView : [];
         this.stateInView = onlyStateInView || null;
+
+        this.updateFilteredCount();
+        this.cdr.markForCheck();
       }
     );
   }
