@@ -285,7 +285,10 @@ import { SessionStatusComponent } from './components/session-status/session-stat
     providePrimeNG({
       theme: {
         preset: Bootstrap4DarkBlue,
-        options: { darkModeSelector: '.p-dark' }
+        options: {
+          darkModeSelector: '.p-dark',
+          cssLayer: { name: 'primeng', order: 'primeng' },
+        }
       }
     }),
   ],
