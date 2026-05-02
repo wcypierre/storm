@@ -1,5 +1,7 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
+import {providePrimeNG} from 'primeng/config';
+import Aura from '@primeuix/themes/aura';
 
 import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -124,6 +126,12 @@ import { SessionStatusComponent } from './components/session-status/session-stat
       useValue: window.environment,
     },
     DialogService,
+    providePrimeNG({
+      theme: {
+        preset: Aura,
+        options: { darkModeSelector: '.p-dark' }
+      }
+    }),
   ],
   bootstrap: [AppComponent]
 })
