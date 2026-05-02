@@ -6,7 +6,11 @@ import (
 	"fmt"
 	deluge "github.com/gdm85/go-libdeluge"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/relvacode/storm/telemetry"
 	"github.com/spf13/afero"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
 	"go.uber.org/zap"
 	"html/template"
 	"io"
@@ -29,13 +33,14 @@ func appendSuffix(s, suffix string) string {
 	return fmt.Sprint(s, suffix)
 }
 
-func New(log *zap.Logger, pool *ConnectionPool, pathPrefix string, apiKey string, development bool) *Api {
+func New(log *zap.Logger, pool *ConnectionPool, pathPrefix string, apiKey string, development bool, metrics *telemetry.Metrics) *Api {
 	api := &Api{
 		pool:       pool,
 		pathPrefix: strings.TrimSuffix(pathPrefix, "/"),
 		apiKey:     apiKey,
 		log:        log,
 		router:     mux.NewRouter(),
+		Metrics:    metrics,
 	}
 
 	api.router.NotFoundHandler = api.httpNotFound()
@@ -49,8 +54,9 @@ type Api struct {
 	pathPrefix string
 	apiKey     string
 
-	log    *zap.Logger
-	router *mux.Router
+	log     *zap.Logger
+	router  *mux.Router
+	Metrics *telemetry.Metrics
 }
 
 func (api *Api) DelugeHandler(f DelugeMethod) http.HandlerFunc {
@@ -59,6 +65,10 @@ func (api *Api) DelugeHandler(f DelugeMethod) http.HandlerFunc {
 			conn, err := api.pool.Get(r.Context())
 			if err != nil {
 				return nil, err
+			}
+
+			if api.Metrics != nil {
+				api.Metrics.DelugeAPICalls.Add(r.Context(), 1)
 			}
 
 			ret, err := f(conn, r)
@@ -265,6 +275,9 @@ func (api *Api) bind(development bool) {
 		primaryRouter = api.router.PathPrefix(api.pathPrefix).Subrouter()
 	}
 
+	// Prometheus metrics scrape endpoint (unauthenticated)
+	primaryRouter.Methods(http.MethodGet).Path("/metrics").Handler(promhttp.Handler())
+
 	router := primaryRouter.PathPrefix("/api").Subrouter()
 	router.NotFoundHandler = api.httpNotFound()
 
@@ -325,11 +338,23 @@ func (api *Api) bind(development bool) {
 	apiRouter.
 		Methods(http.MethodPost).
 		Path("/torrents").
-		HandlerFunc(api.DelugeHandler(httpAddTorrent))
+		HandlerFunc(api.DelugeHandler(func(conn deluge.DelugeClient, r *http.Request) (interface{}, error) {
+			ret, err := httpAddTorrent(conn, r)
+			if err == nil && api.Metrics != nil {
+				api.Metrics.TorrentOps.Add(r.Context(), 1, metric.WithAttributes(attribute.String("operation", "add")))
+			}
+			return ret, err
+		}))
 	apiRouter.
 		Methods(http.MethodDelete).
 		Path("/torrents").
-		HandlerFunc(api.DelugeHandler(httpDeleteTorrents))
+		HandlerFunc(api.DelugeHandler(func(conn deluge.DelugeClient, r *http.Request) (interface{}, error) {
+			ret, err := httpDeleteTorrents(conn, r)
+			if err == nil && api.Metrics != nil {
+				api.Metrics.TorrentOps.Add(r.Context(), 1, metric.WithAttributes(attribute.String("operation", "remove")))
+			}
+			return ret, err
+		}))
 	apiRouter.
 		Methods(http.MethodPost).
 		Path("/torrents/pause").
@@ -346,7 +371,13 @@ func (api *Api) bind(development bool) {
 	apiRouter.
 		Methods(http.MethodDelete).
 		Path("/torrent/{id}").
-		HandlerFunc(api.DelugeHandler(TorrentHandler(httpDeleteTorrent)))
+		HandlerFunc(api.DelugeHandler(TorrentHandler(func(id string, conn deluge.DelugeClient, r *http.Request) (interface{}, error) {
+			ret, err := httpDeleteTorrent(id, conn, r)
+			if err == nil && api.Metrics != nil {
+				api.Metrics.TorrentOps.Add(r.Context(), 1, metric.WithAttributes(attribute.String("operation", "remove")))
+			}
+			return ret, err
+		})))
 	apiRouter.
 		Methods(http.MethodPut).
 		Path("/torrent/{id}").
