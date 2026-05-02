@@ -13,7 +13,7 @@ export class OrderByPipe implements PipeTransform {
       return values;
     }
 
-    return values.sort((a: T, b: T) => {
+    return [...values].sort((a: T, b: T) => {
       const v0 = a[field];
       const v1 = b[field];
 

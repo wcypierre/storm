@@ -73,7 +73,7 @@
   <t-session-status
     [sessionStatus]="sessionStatus"
     [diskSpace]="diskSpace"
-    [torrentCount]="(torrents ? (torrents | torrentSearch: searchText).length : 0)"
+    [torrentCount]="filteredCount"
   ></t-session-status>
 </div>
 
