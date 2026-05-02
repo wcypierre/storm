@@ -118,6 +118,7 @@ type DelugeOptions struct {
 
 	MaxConnections int       `long:"max-connections" env:"POOL_MAX_CONNECTIONS" required:"true" default:"5" description:"Maximum concurrent Deluge RPC connections"`
 	IdleTime       *Duration `long:"idle-time" env:"POOL_IDLE_TIME" required:"true" default:"30s" description:"Close idle Deluge RPC connections after this duration"`
+	ConnectTimeout *Duration `long:"connect-timeout" env:"POOL_CONNECT_TIMEOUT" required:"true" default:"10s" description:"Timeout for establishing new Deluge RPC connections"`
 }
 
 func (options *DelugeOptions) Client() storm.DelugeProvider {
@@ -143,7 +144,7 @@ func (options *DelugeOptions) Client() storm.DelugeProvider {
 }
 
 func (options *DelugeOptions) Pool(log *zap.Logger) *storm.ConnectionPool {
-	return storm.NewConnectionPool(log, options.MaxConnections, options.IdleTime.Duration, options.Client())
+	return storm.NewConnectionPool(log, options.MaxConnections, options.IdleTime.Duration, options.ConnectTimeout.Duration, options.Client())
 }
 
 type Options struct {
