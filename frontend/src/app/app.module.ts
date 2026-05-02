@@ -10,6 +10,11 @@ import Aura from '@primeuix/themes/aura';
 //   --surface-d: #3f4b5b  (borders)    --text-color: rgba(255,255,255,0.87)
 //   --primary-color: #8dd0ff            --primary-color-text: #151515
 const Bootstrap4DarkBlue = definePreset(Aura, {
+  primitive: {
+    borderRadius: {
+      md: '4px',
+    },
+  },
   semantic: {
     primary: {
       50: '#e8f4ff',
