@@ -1,7 +1,158 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {providePrimeNG} from 'primeng/config';
+import {definePreset} from '@primeuix/themes';
 import Aura from '@primeuix/themes/aura';
+
+// Recreates the PrimeNG v13 bootstrap4-dark-blue colour palette using v21's preset API.
+// Source values extracted from primeng@13.0.3 resources/themes/bootstrap4-dark-blue/theme.css:
+//   --surface-b: #20262e  (page bg)    --surface-a/e/f: #2a323d (cards/overlays)
+//   --surface-d: #3f4b5b  (borders)    --text-color: rgba(255,255,255,0.87)
+//   --primary-color: #8dd0ff            --primary-color-text: #151515
+const Bootstrap4DarkBlue = definePreset(Aura, {
+  semantic: {
+    primary: {
+      50: '#e8f4ff',
+      100: '#c5e4ff',
+      200: '#a3d4ff',
+      300: '#8dd0ff',
+      400: '#6bbcff',
+      500: '#4aa9ff',
+      600: '#2897f7',
+      700: '#0075d6',
+      800: '#0059a7',
+      900: '#003d78',
+      950: '#00214a',
+    },
+    colorScheme: {
+      dark: {
+        surface: {
+          0:   '#ffffff',
+          50:  '#f8f9fa',
+          100: '#dee2e6',
+          200: '#ced4da',
+          300: '#adb5bd',
+          400: '#909397',
+          500: '#6c7289',
+          600: '#495057',
+          700: '#3f4b5b',
+          800: '#2a323d',
+          900: '#20262e',
+          950: '#171c23',
+        },
+        primary: {
+          color: '{primary.300}',
+          contrastColor: '#151515',
+          hoverColor: '{primary.200}',
+          activeColor: '{primary.100}',
+        },
+        highlight: {
+          background: '{primary.300}',
+          focusBackground: '{primary.400}',
+          color: '#151515',
+          focusColor: '#151515',
+        },
+        mask: {
+          background: 'rgba(0,0,0,0.4)',
+          color: '{surface.200}',
+        },
+        formField: {
+          background: '{surface.950}',
+          disabledBackground: '{surface.700}',
+          filledBackground: '{surface.900}',
+          filledHoverBackground: '{surface.900}',
+          filledFocusBackground: '{surface.900}',
+          borderColor: '{surface.700}',
+          hoverBorderColor: '{surface.600}',
+          focusBorderColor: '{primary.color}',
+          invalidBorderColor: '#f19ea6',
+          color: 'rgba(255,255,255,0.87)',
+          disabledColor: 'rgba(255,255,255,0.38)',
+          placeholderColor: 'rgba(255,255,255,0.38)',
+          invalidPlaceholderColor: '#f19ea6',
+          floatLabelColor: 'rgba(255,255,255,0.38)',
+          floatLabelFocusColor: '{primary.color}',
+          floatLabelActiveColor: 'rgba(255,255,255,0.38)',
+          floatLabelInvalidColor: '#f19ea6',
+          iconColor: 'rgba(255,255,255,0.38)',
+          shadow: 'none',
+        },
+        text: {
+          color: 'rgba(255,255,255,0.87)',
+          hoverColor: 'rgba(255,255,255,0.87)',
+          mutedColor: 'rgba(255,255,255,0.6)',
+          hoverMutedColor: 'rgba(255,255,255,0.7)',
+        },
+        content: {
+          background: '{surface.800}',
+          hoverBackground: 'rgba(255,255,255,0.04)',
+          borderColor: '{surface.700}',
+          color: '{text.color}',
+          hoverColor: '{text.hover.color}',
+        },
+        overlay: {
+          select: {
+            background: '{surface.800}',
+            borderColor: '{surface.700}',
+            color: '{text.color}',
+          },
+          popover: {
+            background: '{surface.800}',
+            borderColor: '{surface.700}',
+            color: '{text.color}',
+          },
+          modal: {
+            background: '{surface.800}',
+            borderColor: '{surface.700}',
+            color: '{text.color}',
+          },
+        },
+        list: {
+          option: {
+            focusBackground: 'rgba(255,255,255,0.04)',
+            selectedBackground: '{primary.color}',
+            selectedFocusBackground: '{primary.hover.color}',
+            color: '{text.color}',
+            focusColor: '{text.color}',
+            selectedColor: '{primary.contrast.color}',
+            selectedFocusColor: '{primary.contrast.color}',
+            icon: {
+              color: 'rgba(255,255,255,0.38)',
+              focusColor: 'rgba(255,255,255,0.6)',
+            },
+          },
+          optionGroup: {
+            background: 'transparent',
+            color: '{text.muted.color}',
+          },
+        },
+        navigation: {
+          item: {
+            focusBackground: 'rgba(255,255,255,0.04)',
+            activeBackground: 'rgba(255,255,255,0.04)',
+            color: '{text.color}',
+            focusColor: '{text.color}',
+            activeColor: '{text.color}',
+            icon: {
+              color: 'rgba(255,255,255,0.38)',
+              focusColor: 'rgba(255,255,255,0.6)',
+              activeColor: 'rgba(255,255,255,0.6)',
+            },
+          },
+          submenuLabel: {
+            background: 'transparent',
+            color: '{text.muted.color}',
+          },
+          submenuIcon: {
+            color: 'rgba(255,255,255,0.38)',
+            focusColor: 'rgba(255,255,255,0.6)',
+            activeColor: 'rgba(255,255,255,0.6)',
+          },
+        },
+      },
+    },
+  },
+});
 
 import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -128,7 +279,7 @@ import { SessionStatusComponent } from './components/session-status/session-stat
     DialogService,
     providePrimeNG({
       theme: {
-        preset: Aura,
+        preset: Bootstrap4DarkBlue,
         options: { darkModeSelector: '.p-dark' }
       }
     }),
