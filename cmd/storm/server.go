@@ -6,6 +6,7 @@ import (
 	deluge "github.com/gdm85/go-libdeluge"
 	"github.com/jessevdk/go-flags"
 	storm "github.com/relvacode/storm"
+	"github.com/relvacode/storm/telemetry"
 	"go.uber.org/zap"
 	"net/http"
 	"os"
@@ -168,6 +169,17 @@ func Main() error {
 
 	ctx := signalContext(context.Background())
 
+	shutdownTelemetry, err := telemetry.Setup(ctx, "storm")
+	if err != nil {
+		log.Fatal("telemetry setup failed", zap.Error(err))
+	}
+	defer shutdownTelemetry()
+
+	metrics, err := telemetry.NewMetrics()
+	if err != nil {
+		log.Fatal("metrics setup failed", zap.Error(err))
+	}
+
 	pool := (&options.DelugeOptions).Pool(log.Named("pool"))
 	defer pool.Close()
 
@@ -177,7 +189,7 @@ func Main() error {
 
 	var (
 		apiLog = log.Named("api")
-		api    = storm.New(apiLog, pool, (string)(*options.BasePath), options.ServerOptions.ApiKey, options.DevelopmentMode)
+		api    = storm.New(apiLog, pool, (string)(*options.BasePath), options.ServerOptions.ApiKey, options.DevelopmentMode, metrics)
 	)
 
 	return (&options.ServerOptions).RunHandler(ctx, apiLog, api)
