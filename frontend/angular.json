@@ -30,6 +30,7 @@
             "styles": [
               "node_modules/primeflex/primeflex.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.css",
+              "src/bootstrap4-dark-blue-v21.css",
               "src/icons.scss",
               "src/styles.scss"
             ],
