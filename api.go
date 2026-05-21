@@ -278,6 +278,13 @@ func (api *Api) bind(development bool) {
 	// Prometheus metrics scrape endpoint (unauthenticated)
 	primaryRouter.Methods(http.MethodGet).Path("/metrics").Handler(promhttp.Handler())
 
+	// Health check endpoint (unauthenticated)
+	primaryRouter.Methods(http.MethodGet).Path("/health").HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Set("Content-Type", "application/json")
+		rw.WriteHeader(http.StatusOK)
+		_, _ = rw.Write([]byte(`{"status":"ok"}`))
+	})
+
 	router := primaryRouter.PathPrefix("/api").Subrouter()
 	router.NotFoundHandler = api.httpNotFound()
 
