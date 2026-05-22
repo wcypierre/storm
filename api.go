@@ -9,8 +9,11 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/relvacode/storm/telemetry"
 	"github.com/spf13/afero"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"html/template"
 	"io"
@@ -20,6 +23,9 @@ import (
 	"strings"
 	"time"
 )
+
+// tracer is the package-level OTel tracer for storm business spans.
+var tracer = otel.Tracer("storm")
 
 const (
 	ApiAuthCookieName = "storm-api-key"
@@ -62,15 +68,25 @@ type Api struct {
 func (api *Api) DelugeHandler(f DelugeMethod) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		_ = Handle(rw, r, func(r *http.Request) (interface{}, error) {
-			conn, err := api.pool.Get(r.Context())
+			ctx := r.Context()
+
+			conn, err := api.pool.Get(ctx)
 			if err != nil {
+				if api.Metrics != nil {
+					api.Metrics.ExternalCalls.Add(ctx, 1, metric.WithAttributes(
+						attribute.String("target", "deluge"),
+						attribute.String("operation", "pool.get"),
+						attribute.String("outcome", "error"),
+					))
+				}
 				return nil, err
 			}
 
 			if api.Metrics != nil {
-				api.Metrics.DelugeAPICalls.Add(r.Context(), 1)
+				api.Metrics.DelugeAPICalls.Add(ctx, 1)
 			}
 
+			start := time.Now()
 			ret, err := f(conn, r)
 			api.pool.Put(conn)
 
@@ -80,6 +96,20 @@ func (api *Api) DelugeHandler(f DelugeMethod) http.HandlerFunc {
 					ExceptionType:    t.ExceptionType,
 					ExceptionMessage: t.ExceptionMessage,
 				}
+			}
+
+			if api.Metrics != nil {
+				outcome := "ok"
+				if err != nil {
+					outcome = "error"
+				}
+				attrs := metric.WithAttributes(
+					attribute.String("target", "deluge"),
+					attribute.String("operation", "rpc"),
+					attribute.String("outcome", outcome),
+				)
+				api.Metrics.ExternalCalls.Add(ctx, 1, attrs)
+				api.Metrics.ExternalCallDuration.Record(ctx, time.Since(start).Seconds(), attrs)
 			}
 
 			return ret, err
@@ -200,10 +230,16 @@ func (api *Api) keyFromRequest(r *http.Request) (string, bool) {
 
 // logForRequest takes a WrappedResponse and an incoming HTTP request and logs it
 func (api *Api) logForRequest(rw *WrappedResponse, r *http.Request) {
-	logger := api.log.With(
+	logger := api.log
+	if sc := trace.SpanFromContext(r.Context()).SpanContext(); sc.IsValid() {
+		logger = logger.With(
+			zap.String("trace_id", sc.TraceID().String()),
+			zap.String("span_id", sc.SpanID().String()),
+		)
+	}
+	logger = logger.With(
 		zap.String("Method", r.Method),
 		zap.String("URL", r.URL.String()),
-		zap.String("RemoteAddr", r.RemoteAddr),
 		zap.Time("Time", rw.Started()),
 		zap.Int("StatusCode", rw.code),
 		zap.Int("ResponseSize", rw.Len()),
@@ -225,11 +261,58 @@ func (api *Api) logForRequest(rw *WrappedResponse, r *http.Request) {
 
 func (api *Api) httpMiddlewareLog(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		// Resolve the matched route template so span/metric labels are
+		// low-cardinality (e.g. "/api/torrent/{id}", not the resolved hash).
+		route := r.URL.Path
+		if cur := mux.CurrentRoute(r); cur != nil {
+			if t, err := cur.GetPathTemplate(); err == nil {
+				route = t
+			}
+		}
+
+		ctx, span := tracer.Start(r.Context(), r.Method+" "+route,
+			trace.WithSpanKind(trace.SpanKindServer),
+			trace.WithAttributes(
+				attribute.String("http.request.method", r.Method),
+				attribute.String("url.path", route),
+			),
+		)
+		defer span.End()
+
+		inflightAttrs := metric.WithAttributes(attribute.String("operation", route))
+		if api.Metrics != nil {
+			api.Metrics.InflightOps.Add(ctx, 1, inflightAttrs)
+			defer api.Metrics.InflightOps.Add(ctx, -1, inflightAttrs)
+		}
+
 		wr := WrapResponse(rw)
 
-		next.ServeHTTP(wr, r)
+		next.ServeHTTP(wr, r.WithContext(ctx))
+
+		span.SetAttributes(attribute.Int("http.response.status_code", wr.code))
+		if wr.error != nil {
+			span.RecordError(wr.error)
+			if wr.code >= 500 {
+				span.SetStatus(codes.Error, genericSpanErrorStatus)
+			}
+		}
 
 		api.logForRequest(wr, r)
+
+		if api.Metrics != nil {
+			durAttrs := metric.WithAttributes(
+				attribute.String("method", r.Method),
+				attribute.String("route", route),
+				attribute.Int("status_code", wr.code),
+			)
+			api.Metrics.RequestDuration.Record(ctx, wr.Duration().Seconds(), durAttrs)
+			if wr.error != nil && wr.code >= 500 {
+				api.Metrics.AppErrors.Add(ctx, 1, metric.WithAttributes(
+					attribute.String("operation", route),
+					attribute.String("error_type", fmt.Sprintf("%T", wr.error)),
+				))
+			}
+		}
 	})
 }
 

@@ -30,15 +30,18 @@ func Setup(ctx context.Context, serviceName string) (func(), error) {
 	mp := metric.NewMeterProvider(metric.WithReader(promExp), metric.WithResource(res))
 	otel.SetMeterProvider(mp)
 
-	// OTLP trace exporter
+	// OTLP trace exporter.
+	// MUST default to localhost:4318. Storm has no public trace route; spans
+	// are only exported via a co-located collector.
 	endpoint := os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
 	if endpoint == "" {
 		endpoint = "localhost:4318"
 	}
-	traceExp, err := otlptracehttp.New(ctx,
-		otlptracehttp.WithEndpoint(endpoint),
-		otlptracehttp.WithInsecure(),
-	)
+	traceOpts := []otlptracehttp.Option{otlptracehttp.WithEndpoint(endpoint)}
+	if os.Getenv("OTEL_EXPORTER_OTLP_INSECURE") == "true" {
+		traceOpts = append(traceOpts, otlptracehttp.WithInsecure())
+	}
+	traceExp, err := otlptracehttp.New(ctx, traceOpts...)
 	if err != nil {
 		return nil, fmt.Errorf("create otlp trace exporter: %w", err)
 	}
