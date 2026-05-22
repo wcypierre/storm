@@ -4,6 +4,7 @@ import (
 	"fmt"
 	deluge "github.com/gdm85/go-libdeluge"
 	"github.com/gorilla/mux"
+	"go.opentelemetry.io/otel/attribute"
 	"net/http"
 	"net/url"
 )
@@ -19,17 +20,27 @@ func torrentIDs(q url.Values, min int) ([]string, error) {
 	return ids, nil
 }
 
-func httpTorrentsStatus(conn deluge.DelugeClient, r *http.Request) (interface{}, error) {
+func httpTorrentsStatus(conn deluge.DelugeClient, r *http.Request) (ret interface{}, err error) {
+	_, span := tracer.Start(r.Context(), "storm.torrent.list_status")
+	defer endSpan(span, &err)
+
 	var (
 		q     = r.URL.Query()
 		ids   = q["id"]
 		state = deluge.TorrentState(q.Get("state"))
 	)
+	span.SetAttributes(
+		attribute.Int("storm.torrent.requested_count", len(ids)),
+		attribute.String("storm.torrent.state_filter", string(state)),
+	)
 
 	return conn.TorrentsStatus(state, ids)
 }
 
-func httpDeleteTorrents(conn deluge.DelugeClient, r *http.Request) (interface{}, error) {
+func httpDeleteTorrents(conn deluge.DelugeClient, r *http.Request) (ret interface{}, err error) {
+	_, span := tracer.Start(r.Context(), "storm.torrent.delete_many")
+	defer endSpan(span, &err)
+
 	var (
 		q       = r.URL.Query()
 		rmFiles = q.Get("files") == "true"
@@ -39,6 +50,10 @@ func httpDeleteTorrents(conn deluge.DelugeClient, r *http.Request) (interface{},
 	if err != nil {
 		return nil, err
 	}
+	span.SetAttributes(
+		attribute.Int("storm.torrent.count", len(ids)),
+		attribute.Bool("storm.torrent.remove_files", rmFiles),
+	)
 
 	errors, err := conn.RemoveTorrents(ids, rmFiles)
 	if err != nil {
@@ -46,26 +61,35 @@ func httpDeleteTorrents(conn deluge.DelugeClient, r *http.Request) (interface{},
 	}
 
 	if len(errors) > 0 {
+		span.SetAttributes(attribute.Int("storm.torrent.partial_failures", len(errors)))
 		return &errors, nil
 	}
 
 	return nil, nil
 }
 
-func httpPauseTorrents(conn deluge.DelugeClient, r *http.Request) (interface{}, error) {
+func httpPauseTorrents(conn deluge.DelugeClient, r *http.Request) (ret interface{}, err error) {
+	_, span := tracer.Start(r.Context(), "storm.torrent.pause_many")
+	defer endSpan(span, &err)
+
 	ids, err := torrentIDs(r.URL.Query(), 1)
 	if err != nil {
 		return nil, err
 	}
+	span.SetAttributes(attribute.Int("storm.torrent.count", len(ids)))
 
 	return nil, conn.PauseTorrents(ids...)
 }
 
-func httpResumeTorrents(conn deluge.DelugeClient, r *http.Request) (interface{}, error) {
+func httpResumeTorrents(conn deluge.DelugeClient, r *http.Request) (ret interface{}, err error) {
+	_, span := tracer.Start(r.Context(), "storm.torrent.resume_many")
+	defer endSpan(span, &err)
+
 	ids, err := torrentIDs(r.URL.Query(), 1)
 	if err != nil {
 		return nil, err
 	}
+	span.SetAttributes(attribute.Int("storm.torrent.count", len(ids)))
 
 	return nil, conn.ResumeTorrents(ids...)
 }
@@ -82,13 +106,17 @@ type AddTorrentResponse struct {
 	ID string
 }
 
-func httpAddTorrent(conn deluge.DelugeClient, r *http.Request) (interface{}, error) {
+func httpAddTorrent(conn deluge.DelugeClient, r *http.Request) (ret interface{}, err error) {
+	_, span := tracer.Start(r.Context(), "storm.torrent.add")
+	defer endSpan(span, &err)
+
 	var req AddTorrentRequest
 
-	err := Read(r, &req)
+	err = Read(r, &req)
 	if err != nil {
 		return nil, err
 	}
+	span.SetAttributes(attribute.String("storm.torrent.source_type", req.Type))
 
 	var id string
 	switch req.Type {
@@ -111,6 +139,7 @@ func httpAddTorrent(conn deluge.DelugeClient, r *http.Request) (interface{}, err
 		return nil, &Error{Code: http.StatusUnprocessableEntity, Message: "Torrent file could not be read"}
 	}
 
+	span.SetAttributes(attribute.String("storm.torrent.hash", redactSensitiveAttr(id)))
 	return AddTorrentResponse{ID: id}, nil
 }
 
@@ -123,12 +152,25 @@ func TorrentHandler(f TorrentMethod) DelugeMethod {
 	}
 }
 
-func httpTorrentStatus(id string, conn deluge.DelugeClient, _ *http.Request) (interface{}, error) {
+func httpTorrentStatus(id string, conn deluge.DelugeClient, r *http.Request) (ret interface{}, err error) {
+	_, span := tracer.Start(r.Context(), "storm.torrent.status")
+	defer endSpan(span, &err)
+	span.SetAttributes(attribute.String("storm.torrent.hash", redactSensitiveAttr(id)))
+
 	return conn.TorrentStatus(id)
 }
 
-func httpDeleteTorrent(id string, conn deluge.DelugeClient, r *http.Request) (interface{}, error) {
-	ok, err := conn.RemoveTorrent(id, r.URL.Query().Get("files") == "true")
+func httpDeleteTorrent(id string, conn deluge.DelugeClient, r *http.Request) (ret interface{}, err error) {
+	_, span := tracer.Start(r.Context(), "storm.torrent.delete")
+	defer endSpan(span, &err)
+
+	rmFiles := r.URL.Query().Get("files") == "true"
+	span.SetAttributes(
+		attribute.String("storm.torrent.hash", redactSensitiveAttr(id)),
+		attribute.Bool("storm.torrent.remove_files", rmFiles),
+	)
+
+	ok, err := conn.RemoveTorrent(id, rmFiles)
 	if err != nil {
 		return nil, err
 	}
@@ -140,18 +182,30 @@ func httpDeleteTorrent(id string, conn deluge.DelugeClient, r *http.Request) (in
 	return nil, nil
 }
 
-func httpPauseTorrent(id string, conn deluge.DelugeClient, _ *http.Request) (interface{}, error) {
+func httpPauseTorrent(id string, conn deluge.DelugeClient, r *http.Request) (ret interface{}, err error) {
+	_, span := tracer.Start(r.Context(), "storm.torrent.pause")
+	defer endSpan(span, &err)
+	span.SetAttributes(attribute.String("storm.torrent.hash", redactSensitiveAttr(id)))
+
 	return nil, conn.PauseTorrents(id)
 }
 
-func httpResumeTorrent(id string, conn deluge.DelugeClient, _ *http.Request) (interface{}, error) {
+func httpResumeTorrent(id string, conn deluge.DelugeClient, r *http.Request) (ret interface{}, err error) {
+	_, span := tracer.Start(r.Context(), "storm.torrent.resume")
+	defer endSpan(span, &err)
+	span.SetAttributes(attribute.String("storm.torrent.hash", redactSensitiveAttr(id)))
+
 	return nil, conn.ResumeTorrents(id)
 }
 
-func httpSetTorrentOptions(id string, conn deluge.DelugeClient, r *http.Request) (interface{}, error) {
+func httpSetTorrentOptions(id string, conn deluge.DelugeClient, r *http.Request) (ret interface{}, err error) {
+	_, span := tracer.Start(r.Context(), "storm.torrent.set_options")
+	defer endSpan(span, &err)
+	span.SetAttributes(attribute.String("storm.torrent.hash", redactSensitiveAttr(id)))
+
 	var req deluge.Options
 
-	err := Read(r, &req)
+	err = Read(r, &req)
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +213,10 @@ func httpSetTorrentOptions(id string, conn deluge.DelugeClient, r *http.Request)
 	return nil, conn.SetTorrentOptions(id, &req)
 }
 
-func httpGetSessionStatus(conn deluge.DelugeClient, _ *http.Request) (interface{}, error) {
+func httpGetSessionStatus(conn deluge.DelugeClient, r *http.Request) (ret interface{}, err error) {
+	_, span := tracer.Start(r.Context(), "storm.session.status")
+	defer endSpan(span, &err)
+
 	return conn.GetSessionStatus()
 }
 
@@ -167,13 +224,17 @@ type GetFreeSpaceResponse struct {
 	FreeBytes int64
 }
 
-func httpGetFreeSpace(conn deluge.DelugeClient, r *http.Request) (interface{}, error) {
+func httpGetFreeSpace(conn deluge.DelugeClient, r *http.Request) (ret interface{}, err error) {
+	_, span := tracer.Start(r.Context(), "storm.disk.free_space")
+	defer endSpan(span, &err)
+
 	path := r.URL.Query().Get("path")
 
 	freeBytes, err := conn.GetFreeSpace(path)
 	if err != nil {
 		return nil, err
 	}
+	span.SetAttributes(attribute.Int64("storm.disk.free_bytes", freeBytes))
 
 	return GetFreeSpaceResponse{
 		FreeBytes: freeBytes,
