@@ -56,6 +56,18 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "^2.2.0",
     "ts-node": "~10.9.2",
-    "typescript": "~6.0.3"
+    "typescript": "~5.9.3"
+  },
+  "overrides": {
+    "@babel/plugin-transform-modules-systemjs": "7.29.4",
+    "brace-expansion": "5.0.6",
+    "qs": "6.15.2",
+    "ws": "8.21.0",
+    "fast-uri": "3.1.2",
+    "hono": "4.12.22",
+    "ip-address": "10.2.0",
+    "uuid": "11.1.1",
+    "webpack-dev-server": "5.2.4",
+    "express-rate-limit": "8.5.2"
   }
 }

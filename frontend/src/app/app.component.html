@@ -8,7 +8,7 @@
     <button pButton pRipple type="button" class="t-menu-button"
             (click)="onToggleInView(stateInView === 'Paused' ? 'resume' : 'pause', torrents)"
             [disabled]="empty"
-            [pTooltip]="stateInView == 'Paused' ? 'Resume' : 'Pause'"
+            [pTooltip]="stateInView === 'Paused' ? 'Resume' : 'Pause'"
             [icon]="stateInView === 'Paused' ? 'fas fa-play' : 'fas fa-pause'"
             [attr.aria-label]="stateInView === 'Paused' ? 'Resume all torrents' : 'Pause all torrents'"
     ></button>

@@ -81,7 +81,7 @@
         <div class="field col-12 md:col-3">
           <label for="o-removeAtRatio">Remove At Ratio</label>
           <p-inputNumber inputId="o-removeAtRatio" [(ngModel)]="config.RemoveAtRatio" [min]="config.StopRatio"
-                         [disabled]="!config.StopRatio && config.StopRatio != 0">
+                         [disabled]="!config.StopRatio && config.StopRatio !== 0">
           </p-inputNumber>
         </div>
 
