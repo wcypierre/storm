@@ -5,7 +5,8 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
-      time: "00:00"
+      time: "06:00"
+      timezone: "Asia/Kuala_Lumpur"
     open-pull-requests-limit: 10
     groups:
       go-dependencies:
@@ -21,7 +22,8 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
-      time: "00:00"
+      time: "06:00"
+      timezone: "Asia/Kuala_Lumpur"
     open-pull-requests-limit: 10
     groups:
       production-dependencies:
@@ -38,7 +40,8 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
-      time: "00:00"
+      time: "06:00"
+      timezone: "Asia/Kuala_Lumpur"
     open-pull-requests-limit: 10
     groups:
       all-security-updates:
@@ -51,7 +54,8 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
-      time: "00:00"
+      time: "06:00"
+      timezone: "Asia/Kuala_Lumpur"
     open-pull-requests-limit: 10
     groups:
       all-security-updates:
