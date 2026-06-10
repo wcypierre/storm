@@ -8,7 +8,7 @@ permissions:
 jobs:
   compile-frontend:
     name: Compile Frontend
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -27,7 +27,7 @@ jobs:
           if-no-files-found: error
   go-binary-release:
     name: Release Go Binary
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: compile-frontend
     strategy:
       matrix:
@@ -60,7 +60,7 @@ jobs:
           overwrite: true
   docker-image:
     name: Build Docker Image
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       packages: write
       contents: read
