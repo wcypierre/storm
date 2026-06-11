@@ -22,7 +22,7 @@ concurrency:
 jobs:
   frontend-lint:
     name: Frontend Lint
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
@@ -40,7 +40,7 @@ jobs:
 
   frontend-test:
     name: Frontend Test
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
@@ -58,7 +58,7 @@ jobs:
 
   frontend-build:
     name: Frontend Build
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
@@ -81,7 +81,7 @@ jobs:
 
   security-audit:
     name: Security Audit
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
