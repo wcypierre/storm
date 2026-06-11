@@ -1,3 +1,5 @@
+name: Release
+
 on:
   release:
     types: [ created ]
@@ -5,10 +7,16 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: release-${{ github.event.release.tag_name || github.ref }}
+  cancel-in-progress: false
+
 jobs:
   compile-frontend:
     name: Compile Frontend
     runs-on: self-hosted
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -18,7 +26,7 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - run: |
           cd frontend
-          npm install --legacy-peer-deps
+          npm ci --legacy-peer-deps
           npm run build:prod
       - uses: actions/upload-artifact@v7
         with:
@@ -29,6 +37,8 @@ jobs:
     name: Release Go Binary
     runs-on: self-hosted
     needs: compile-frontend
+    permissions:
+      contents: write
     strategy:
       matrix:
         goos: [ linux, windows, darwin ]
@@ -78,13 +88,19 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=latest
+            type=raw,value=${{ github.ref_name }}
       - uses: docker/build-push-action@v7
         with:
           context: .
           push: true
-          tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           platforms: |
             linux/amd64
             linux/arm64
