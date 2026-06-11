@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { TorrentDetailsDialogComponent } from './torrent-details-dialog.component';
 
 describe('TorrentDetailsDialogComponent', () => {
@@ -8,7 +9,12 @@ describe('TorrentDetailsDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TorrentDetailsDialogComponent ]
+      declarations: [ TorrentDetailsDialogComponent ],
+      providers: [
+        { provide: DynamicDialogRef, useValue: { close: jasmine.createSpy('close') } },
+        { provide: DynamicDialogConfig, useValue: { data: { id: 'test-id', torrent: null } } }
+      ],
+      schemas: [ NO_ERRORS_SCHEMA ]
     })
     .compileComponents();
   });

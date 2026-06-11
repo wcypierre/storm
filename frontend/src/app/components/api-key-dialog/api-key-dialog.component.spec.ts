@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ApiKeyDialogComponent } from './api-key-dialog.component';
 
 describe('ApiKeyDialogComponent', () => {
@@ -8,7 +10,12 @@ describe('ApiKeyDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ApiKeyDialogComponent ]
+      declarations: [ ApiKeyDialogComponent ],
+      imports: [ FormsModule ],
+      providers: [
+        { provide: DynamicDialogRef, useValue: { close: jasmine.createSpy('close') } }
+      ],
+      schemas: [ NO_ERRORS_SCHEMA ]
     })
     .compileComponents();
   });

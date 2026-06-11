@@ -1,7 +1,7 @@
 <form (ngSubmit)="onSubmit()">
   <div class="grid p-fluid">
     <div class="field col-12">
-      <input #input="ngModel" pInputText type="password" placeholder="Enter API Key" required autofocus [(ngModel)]="key" >
+      <input #input="ngModel" name="key" pInputText type="password" placeholder="Enter API Key" required autofocus [(ngModel)]="key" >
     </div>
   </div>
 

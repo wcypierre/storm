@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
+import { ApiService } from '../../../api.service';
 import { AddTorrentUrlInputComponent } from './add-torrent-url-input.component';
 
 describe('AddTorrentUrlInputComponent', () => {
@@ -8,7 +10,13 @@ describe('AddTorrentUrlInputComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AddTorrentUrlInputComponent ]
+      declarations: [ AddTorrentUrlInputComponent ],
+      providers: [
+        { provide: DynamicDialogRef, useValue: { close: jasmine.createSpy('close') } },
+        { provide: DynamicDialogConfig, useValue: { data: { url: '' } } },
+        { provide: ApiService, useValue: { add: jasmine.createSpy('add') } }
+      ],
+      schemas: [ NO_ERRORS_SCHEMA ]
     })
     .compileComponents();
   });

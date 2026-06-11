@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
+import { ApiService } from '../../api.service';
 import { PluginEnableComponent } from './plugin-enable.component';
 
 describe('PluginEnableComponent', () => {
@@ -8,7 +10,13 @@ describe('PluginEnableComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PluginEnableComponent ]
+      declarations: [ PluginEnableComponent ],
+      providers: [
+        { provide: DynamicDialogRef, useValue: { close: jasmine.createSpy('close') } },
+        { provide: DynamicDialogConfig, useValue: { data: { name: 'TestPlugin' } } },
+        { provide: ApiService, useValue: { enablePlugin: jasmine.createSpy('enablePlugin') } }
+      ],
+      schemas: [ NO_ERRORS_SCHEMA ]
     })
     .compileComponents();
   });

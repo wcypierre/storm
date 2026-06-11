@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { TorrentEditLabelService } from '../torrent-edit-label-dialog/torrent-edit-label-dialog.component';
 import { TorrentLabelComponent } from './torrent-label.component';
 
 describe('TorrentLabelComponent', () => {
@@ -8,7 +9,11 @@ describe('TorrentLabelComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TorrentLabelComponent ]
+      declarations: [ TorrentLabelComponent ],
+      providers: [
+        { provide: TorrentEditLabelService, useValue: { open: jasmine.createSpy('open') } }
+      ],
+      schemas: [ NO_ERRORS_SCHEMA ]
     })
     .compileComponents();
   });
