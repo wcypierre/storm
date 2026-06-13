@@ -16,3 +16,8 @@ frontend/coverage
 telemetry_cover.html
 telemetry_cover.out
 tel_cov.out
+
+*.md
+frontend/dist
+**/*_test.go
+testdata/
