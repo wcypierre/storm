@@ -234,11 +234,13 @@ func (pool *ConnectionPool) getConn(req *poolReq) {
 	case r := <-connectCh:
 		if r.err != nil {
 			pool.Log.Error("Failed to establish Deluge RPC connection", zap.Error(r.err))
+			pool.Log.Info("Hint: if your Deluge daemon is version 2.x, set DELUGE_RPC_VERSION=v2 (default is v1)")
 		} else {
 			conn = newConn
 		}
 	case <-timeout:
 		pool.Log.Error("Timed out establishing Deluge RPC connection", zap.Duration("timeout", pool.ConnectTimeout))
+		pool.Log.Info("Hint: if your Deluge daemon is version 2.x, set DELUGE_RPC_VERSION=v2 (default is v1)")
 		go func() { <-connectCh; newConn.Close() }()
 	case <-req.ctx.Done():
 		go func() { <-connectCh; newConn.Close() }()

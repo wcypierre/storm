@@ -49,12 +49,14 @@ Then you can use the following environment variables to configure Storm
 | Environment | Description |
 | ----------- | ----------- |
 | `DELUGE_RPC_HOSTNAME` | The Deluge RPC hostname |
-| `DELUGE_RPC_PORT` | The Deluge RPC port |
+| `DELUGE_RPC_PORT` | The Deluge RPC port (default `58846`) |
 | `DELUGE_RPC_USERNAME` | The username from Deluge auth |
 | `DELUGE_RPC_PASSWORD` | The password from Deluge auth |
-| `DELUGE_RPC_VERSION` | `v1` or `v2` depending on your Deluge version |
+| `DELUGE_RPC_VERSION` | `v1` (default) or `v2` — **must match your Deluge daemon version**. If Storm fails to connect, check this setting first. Deluge 1.x uses `v1`; Deluge 2.x requires `v2`. |
 | `STORM_API_KEY` | Enable authentication for the Storm API |
 | `STORM_BASE_PATH` | Set the base URL path. Defaults to `/` |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | OTLP trace collector endpoint (default `localhost:4318`). Only needed if you run a local OpenTelemetry collector. |
+| `OTEL_EXPORTER_OTLP_INSECURE` | Set to `true` to disable TLS for the OTLP trace exporter (useful with a local collector). |
 
 ##### Security
 
@@ -68,7 +70,9 @@ You should also seriously consider the use of HTTPS over the internet, with serv
 
 ##### Deluge Version
 
-Deluge has a different interface between versions 1 and 2. You must set `DELUGE_RPC_VERSION` to either `v1` or `v2` based on the version you have installed. Storm defaults to `v1`.
+Deluge has a different RPC interface between versions 1 and 2. You must set `DELUGE_RPC_VERSION` to either `v1` or `v2` based on the version you have installed. Storm defaults to `v1`.
+
+If Storm cannot connect to the Deluge daemon, it will log a hint reminding you to check this setting. A common symptom of a version mismatch is a connection that is immediately refused or times out with no obvious error. If you see that, set `DELUGE_RPC_VERSION=v2` and restart Storm.
 
 Note that in version 2, different RPC users are not able to see torrents created by another user [(#38)](https://github.com/relvacode/storm/issues/38). If you're using multiple Deluge clients (such as the vanilla Web UI, or Sonarr, etc) you should make sure they're all using the same Deluge RPC account to connect to Deluge.
 

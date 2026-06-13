@@ -7,9 +7,29 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 type DelugeMethod func(conn deluge.DelugeClient, r *http.Request) (interface{}, error)
+
+const (
+	// maxMagnetURILen is the maximum accepted byte length for a magnet URI.
+	// Real-world magnets with many trackers rarely exceed 2 KB; 4 KB is a safe
+	// upper bound that blocks obviously abusive inputs without rejecting valid ones.
+	maxMagnetURILen = 4 * 1024
+
+	// maxTorrentFileSize is the maximum accepted byte length for the base64-encoded
+	// torrent file payload (field "Data" in AddTorrentRequest).
+	// Real-world .torrent files are typically well under 1 MB; 8 MB of base64-encoded
+	// data corresponds to roughly 6 MB decoded, which is generous.
+	// This per-field cap is intentionally below MaxRequestSize (10 MB) so that
+	// oversized file payloads are caught with a clear 400 rather than a generic 413.
+	maxTorrentFileSize = 8 * 1024 * 1024
+
+	// maxTorrentURLLen is the maximum accepted byte length for a URL passed to
+	// Deluge to download a remote .torrent file.
+	maxTorrentURLLen = 4 * 1024
+)
 
 func torrentIDs(q url.Values, min int) ([]string, error) {
 	var ids = q["id"]
@@ -121,10 +141,32 @@ func httpAddTorrent(conn deluge.DelugeClient, r *http.Request) (ret interface{},
 	var id string
 	switch req.Type {
 	case "url":
+		if len(req.URI) == 0 {
+			return nil, &Error{Code: http.StatusBadRequest, Message: "Torrent URL must not be empty"}
+		}
+		if len(req.URI) > maxTorrentURLLen {
+			return nil, &Error{Code: http.StatusBadRequest, Message: fmt.Sprintf("Torrent URL exceeds maximum length of %d bytes", maxTorrentURLLen)}
+		}
 		id, err = conn.AddTorrentURL(req.URI, &req.Options)
 	case "magnet":
+		if len(req.URI) == 0 {
+			return nil, &Error{Code: http.StatusBadRequest, Message: "Magnet URI must not be empty"}
+		}
+		if len(req.URI) > maxMagnetURILen {
+			return nil, &Error{Code: http.StatusBadRequest, Message: fmt.Sprintf("Magnet URI exceeds maximum length of %d bytes", maxMagnetURILen)}
+		}
+		if !strings.HasPrefix(req.URI, "magnet:?") {
+			return nil, &Error{Code: http.StatusBadRequest, Message: "Magnet URI must begin with \"magnet:?\""}
+		}
 		id, err = conn.AddTorrentMagnet(req.URI, &req.Options)
 	case "file":
+		if len(req.Data) == 0 {
+			return nil, &Error{Code: http.StatusBadRequest, Message: "Torrent file data must not be empty"}
+		}
+		// req.Data is a base64-encoded .torrent; cap the encoded length directly.
+		if len(req.Data) > maxTorrentFileSize {
+			return nil, &Error{Code: http.StatusBadRequest, Message: fmt.Sprintf("Torrent file (base64-encoded) exceeds maximum size of %d bytes", maxTorrentFileSize)}
+		}
 		id, err = conn.AddTorrentFile(req.URI, req.Data, &req.Options)
 	default:
 		return nil, &Error{Code: http.StatusBadRequest, Message: "Torrent Type must be one of url, magnet or file"}

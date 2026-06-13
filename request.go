@@ -7,8 +7,11 @@ import (
 )
 
 const (
-	// MaxRequestSize is the maximum allowed request size in bytes
-	MaxRequestSize = 5 << 20
+	// MaxRequestSize is the maximum allowed request body size in bytes.
+	// Set to 10 MB to accommodate torrent file uploads, which are the largest
+	// payloads the API accepts. Individual field limits are enforced separately
+	// within each handler (see maxTorrentFileSize in methods.go).
+	MaxRequestSize = 10 << 20
 )
 
 // Read reads JSON data from the request.
