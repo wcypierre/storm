@@ -8,7 +8,7 @@
   <span><i class="fas fa-upload"></i>{{sessionStatus.TotalUpload | filesize}}</span>
   <span>
     <i class="fas fa-hdd"></i>
-    <span class="t-disk-free">{{diskSpace?.FreeBytes | filesize}}</span>
+    <span class="t-disk-free">{{(diskSpace?.FreeBytes ?? 0) | filesize}}</span>
   </span>
 
   <!-- Moved to the end to keep torrent count as the last footer element -->

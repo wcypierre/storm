@@ -1,5 +1,5 @@
 import {TestBed} from '@angular/core/testing';
-import {PreferencesService} from './preferences.service';
+import {FilterPreferences, PreferencesService} from './preferences.service';
 
 describe('PreferencesService', () => {
   let service: PreferencesService;
@@ -35,7 +35,7 @@ describe('PreferencesService', () => {
   });
 
   it('should clear preferences', () => {
-    const preferences = {
+    const preferences: FilterPreferences = {
       sortByField: 'Name',
       sortReverse: false,
       searchText: '',
