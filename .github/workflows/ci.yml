@@ -148,3 +148,24 @@ jobs:
           cd frontend
           npm ci --legacy-peer-deps
           npm audit --omit=dev --audit-level=moderate
+
+  trivy-image-scan:
+    name: Trivy Image Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image for scanning
+        run: docker build --tag storm-ci:${{ github.sha }} .
+      - name: Scan image for fixable vulnerabilities
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          version: v0.76.1
+          scan-type: image
+          image-ref: storm-ci:${{ github.sha }}
+          format: table
+          scanners: vuln
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
