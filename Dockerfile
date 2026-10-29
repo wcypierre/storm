@@ -6,7 +6,7 @@ WORKDIR /frontend
 
 COPY frontend/package.json frontend/package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
-    npm ci --no-audit --no-fund
+    npm ci --legacy-peer-deps --no-audit --no-fund
 
 COPY frontend/ ./
 RUN npm run build:prod
