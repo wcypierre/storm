@@ -20,6 +20,62 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  go-quality:
+    name: Go Format and Vet
+    runs-on: ubuntu-latest
+    needs: frontend-build
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist-ci
+          path: frontend/dist
+      - name: Check formatting
+        run: test -z "$(git ls-files '*.go' | xargs "$(go env GOROOT)/bin/gofmt" -l)"
+      - run: go vet ./...
+
+  go-test:
+    name: Go Test
+    runs-on: ubuntu-latest
+    needs: frontend-build
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist-ci
+          path: frontend/dist
+      - run: go test ./...
+
+  go-build:
+    name: Go Build
+    runs-on: ubuntu-latest
+    needs: frontend-build
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist-ci
+          path: frontend/dist
+      - run: go build ./...
+
   frontend-lint:
     name: Frontend Lint
     runs-on: ubuntu-latest
@@ -36,7 +92,6 @@ jobs:
           cd frontend
           npm ci --legacy-peer-deps
           npm run lint
-        continue-on-error: true
 
   frontend-test:
     name: Frontend Test
@@ -54,7 +109,6 @@ jobs:
           cd frontend
           npm ci --legacy-peer-deps
           npm run test -- --watch=false --code-coverage --browsers=ChromeHeadless
-        continue-on-error: true
 
   frontend-build:
     name: Frontend Build
@@ -72,7 +126,6 @@ jobs:
           cd frontend
           npm ci --legacy-peer-deps
           npm run build:prod
-        continue-on-error: true
       - uses: actions/upload-artifact@v4
         with:
           name: frontend-dist-ci
@@ -94,5 +147,4 @@ jobs:
       - run: |
           cd frontend
           npm ci --legacy-peer-deps
-          npm audit --audit-level=moderate
-        continue-on-error: true
+          npm audit --omit=dev --audit-level=moderate

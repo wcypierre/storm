@@ -1,7 +1,7 @@
 <p-popover #overlay appendTo="body">
   <p-progressSpinner *ngIf="processing"></p-progressSpinner>
   <div *ngIf="!processing" class="flex flex-column">
-    <p-message *ngFor="let msg of errorMessages" [severity]="msg.severity" [text]="msg.detail"
+    <p-message *ngFor="let msg of errorMessages" severity="error" [text]="msg.detail"
                 [styleClass]="'mb-3'"></p-message>
     <button (click)="onRemove(false)" type="button" pButton pRipple class="p-button t-overlay-button t-button-alt"
             label="Remove" aria-label="Remove selected torrents"></button>

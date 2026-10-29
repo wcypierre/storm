@@ -1,4 +1,4 @@
-<p-message *ngFor="let msg of errorMessages" [severity]="msg.severity" [text]="msg.detail"
+<p-message *ngFor="let msg of errorMessages" severity="error" [text]="msg.detail"
             [styleClass]="'mb-3'"></p-message>
 
 <p>The Deluge plugin <b>{{name}}</b> must be enabled to continue</p>
