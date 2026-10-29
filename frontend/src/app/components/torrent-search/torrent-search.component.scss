@@ -1,1 +1,10 @@
+:host,
+.t-search,
+.p-inputgroup {
+  width: 100%;
+}
 
+input {
+  min-width: 0;
+  flex: 1 1 auto;
+}
