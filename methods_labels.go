@@ -92,10 +92,11 @@ func httpDeleteLabel(conn deluge.DelugeClient, r *http.Request) (ret interface{}
 }
 
 // httpTorrentsLabels gets labels associated with all torrents matching the filter.
-// 		?id[]	One or more torrent IDs
-//		?state	Torrents of this state
 //
-//		Returns a mapping of torrent hash to torrent labels
+//	?id[]	One or more torrent IDs
+//	?state	Torrents of this state
+//
+//	Returns a mapping of torrent hash to torrent labels
 func httpTorrentsLabels(conn deluge.DelugeClient, r *http.Request) (ret interface{}, err error) {
 	_, span := tracer.Start(r.Context(), "storm.label.list_for_torrents")
 	defer endSpan(span, &err)

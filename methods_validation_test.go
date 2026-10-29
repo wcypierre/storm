@@ -20,12 +20,12 @@ type stubDelugeClient struct {
 	calledWith string
 }
 
-func (s *stubDelugeClient) Connect() error                       { return nil }
-func (s *stubDelugeClient) Close() error                         { return nil }
-func (s *stubDelugeClient) DaemonLogin() error                   { return nil }
-func (s *stubDelugeClient) MethodsList() ([]string, error)       { return nil, nil }
-func (s *stubDelugeClient) DaemonVersion() (string, error)       { return "", nil }
-func (s *stubDelugeClient) GetFreeSpace(string) (int64, error)   { return 0, nil }
+func (s *stubDelugeClient) Connect() error                        { return nil }
+func (s *stubDelugeClient) Close() error                          { return nil }
+func (s *stubDelugeClient) DaemonLogin() error                    { return nil }
+func (s *stubDelugeClient) MethodsList() ([]string, error)        { return nil, nil }
+func (s *stubDelugeClient) DaemonVersion() (string, error)        { return "", nil }
+func (s *stubDelugeClient) GetFreeSpace(string) (int64, error)    { return 0, nil }
 func (s *stubDelugeClient) GetLibtorrentVersion() (string, error) { return "", nil }
 func (s *stubDelugeClient) AddTorrentMagnet(uri string, _ *deluge.Options) (string, error) {
 	s.calledWith = uri
@@ -51,25 +51,25 @@ func (s *stubDelugeClient) AddTorrentFile(name, data string, _ *deluge.Options) 
 func (s *stubDelugeClient) RemoveTorrents([]string, bool) ([]deluge.TorrentError, error) {
 	return nil, nil
 }
-func (s *stubDelugeClient) RemoveTorrent(string, bool) (bool, error)          { return false, nil }
-func (s *stubDelugeClient) PauseTorrents(...string) error                      { return nil }
-func (s *stubDelugeClient) ResumeTorrents(...string) error                     { return nil }
+func (s *stubDelugeClient) RemoveTorrent(string, bool) (bool, error) { return false, nil }
+func (s *stubDelugeClient) PauseTorrents(...string) error            { return nil }
+func (s *stubDelugeClient) ResumeTorrents(...string) error           { return nil }
 func (s *stubDelugeClient) TorrentsStatus(deluge.TorrentState, []string) (map[string]*deluge.TorrentStatus, error) {
 	return nil, nil
 }
 func (s *stubDelugeClient) TorrentStatus(string) (*deluge.TorrentStatus, error) { return nil, nil }
 func (s *stubDelugeClient) MoveStorage([]string, string) error                  { return nil }
-func (s *stubDelugeClient) SetTorrentTracker(string, string) error               { return nil }
-func (s *stubDelugeClient) SetTorrentOptions(string, *deluge.Options) error      { return nil }
-func (s *stubDelugeClient) SessionState() ([]string, error)                      { return nil, nil }
-func (s *stubDelugeClient) ForceReannounce([]string) error                       { return nil }
-func (s *stubDelugeClient) GetAvailablePlugins() ([]string, error)               { return nil, nil }
-func (s *stubDelugeClient) GetEnabledPlugins() ([]string, error)                 { return nil, nil }
-func (s *stubDelugeClient) EnablePlugin(string) error                            { return nil }
-func (s *stubDelugeClient) DisablePlugin(string) error                           { return nil }
-func (s *stubDelugeClient) TestListenPort() (bool, error)                        { return false, nil }
-func (s *stubDelugeClient) GetListenPort() (uint16, error)                       { return 0, nil }
-func (s *stubDelugeClient) GetSessionStatus() (*deluge.SessionStatus, error)     { return nil, nil }
+func (s *stubDelugeClient) SetTorrentTracker(string, string) error              { return nil }
+func (s *stubDelugeClient) SetTorrentOptions(string, *deluge.Options) error     { return nil }
+func (s *stubDelugeClient) SessionState() ([]string, error)                     { return nil, nil }
+func (s *stubDelugeClient) ForceReannounce([]string) error                      { return nil }
+func (s *stubDelugeClient) GetAvailablePlugins() ([]string, error)              { return nil, nil }
+func (s *stubDelugeClient) GetEnabledPlugins() ([]string, error)                { return nil, nil }
+func (s *stubDelugeClient) EnablePlugin(string) error                           { return nil }
+func (s *stubDelugeClient) DisablePlugin(string) error                          { return nil }
+func (s *stubDelugeClient) TestListenPort() (bool, error)                       { return false, nil }
+func (s *stubDelugeClient) GetListenPort() (uint16, error)                      { return 0, nil }
+func (s *stubDelugeClient) GetSessionStatus() (*deluge.SessionStatus, error)    { return nil, nil }
 
 // callAddTorrent is a helper that POSTs an AddTorrentRequest to httpAddTorrent
 // and returns the HTTP status code and error message (if any).

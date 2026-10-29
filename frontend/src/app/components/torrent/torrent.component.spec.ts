@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { NgxFilesizeModule } from 'ngx-filesize';
+import { FilesizePipe } from '../../filesize.pipe';
 import { MomentModule } from 'ngx-moment';
 import { ApiService } from '../../api.service';
 import { TorrentComponent } from './torrent.component';
@@ -11,8 +11,8 @@ describe('TorrentComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TorrentComponent ],
-      imports: [ NgxFilesizeModule, MomentModule ],
+      declarations: [ TorrentComponent, FilesizePipe ],
+      imports: [ MomentModule ],
       providers: [
         { provide: ApiService, useValue: { pause: jasmine.createSpy('pause'), resume: jasmine.createSpy('resume'), torrent: jasmine.createSpy('torrent') } }
       ],

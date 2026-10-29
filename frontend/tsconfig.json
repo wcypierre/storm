@@ -18,9 +18,6 @@
     "lib": [
       "es2022",
       "dom"
-    ],
-    "paths": {
-      "filesize": ["./src/filesize-shim.js"]
-    }
+    ]
   }
 }
