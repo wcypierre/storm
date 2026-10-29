@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { NgxFilesizeModule } from 'ngx-filesize';
+import { FilesizePipe } from '../../filesize.pipe';
 import { SessionStatusComponent } from './session-status.component';
 
 describe('SessionStatusComponent', () => {
@@ -9,8 +9,7 @@ describe('SessionStatusComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SessionStatusComponent ],
-      imports: [ NgxFilesizeModule ],
+      declarations: [ SessionStatusComponent, FilesizePipe ],
       schemas: [ NO_ERRORS_SCHEMA ]
     })
     .compileComponents();

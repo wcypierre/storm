@@ -164,7 +164,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {TorrentStateComponent} from './components/torrent-state/torrent-state.component';
 import {TorrentComponent} from './components/torrent/torrent.component';
 import {ProgressBarModule} from 'primeng/progressbar';
-import {NgxFilesizeModule} from 'ngx-filesize';
+import {FilesizePipe} from './filesize.pipe';
 import {ButtonModule} from 'primeng/button';
 import {RippleModule} from 'primeng/ripple';
 import {TooltipModule} from 'primeng/tooltip';
@@ -236,13 +236,13 @@ import { SessionStatusComponent } from './components/session-status/session-stat
     ActivityMarkerComponent,
     ApiKeyDialogComponent,
     SessionStatusComponent,
+    FilesizePipe,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
 
-    NgxFilesizeModule,
     ProgressBarModule,
     MenuModule,
     ButtonModule,
