@@ -9,3 +9,7 @@ frontend/dist
 # Coverage artifacts
 *.out
 *_cover.html
+
+# Local compose credentials (use *.example templates)
+docker-compose/auth
+docker-compose/.env

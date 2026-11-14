@@ -33,4 +33,7 @@ FROM scratch
 COPY --from=compiler /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=compiler /out/storm /usr/bin/storm
 
+# Numeric non-root user (scratch has no /etc/passwd). Port 8221 does not require root.
+USER 65532:65532
+
 ENTRYPOINT ["/usr/bin/storm"]

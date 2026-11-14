@@ -11,7 +11,7 @@ services:
       DELUGE_RPC_VERSION: v2
       DELUGE_RPC_HOSTNAME: deluge
       DELUGE_RPC_USERNAME: localclient
-      DELUGE_RPC_PASSWORD: deluge
+      DELUGE_RPC_PASSWORD: ${DELUGE_RPC_PASSWORD}
     ports:
       - "8221:8221"
 

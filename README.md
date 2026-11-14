@@ -33,6 +33,8 @@ docker run --name storm \
 
 The recommended way to run Storm is with a Docker image. 
 
+For the sample compose stack under `docker-compose/`, copy `auth.example` to `auth` and `.env.example` to `.env`, then set a local-only Deluge RPC password in both files before `docker compose up`.
+
 You'll need a Deluge container running with a valid [auth configuration](https://dev.deluge-torrent.org/wiki/UserGuide/Authentication). 
 Storm needs a way to contact the Deluge RPC daemon so it's best that you create a [Docker network](https://docs.docker.com/engine/tutorials/networkingcontainers/) and attach the Storm container to that network.
 
