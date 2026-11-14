@@ -1,7 +1,7 @@
 package storm
 
 import (
-	"crypto/sha1"
+	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	deluge "github.com/gdm85/go-libdeluge"
@@ -104,7 +104,7 @@ func httpViewUpdate(conn deluge.DelugeClient, r *http.Request) (ret interface{},
 	}
 
 	// ETag calculation
-	var h = sha1.New()
+	var h = sha256.New()
 	_ = json.NewEncoder(h).Encode(&update)
 
 	responseETag := hex.EncodeToString(h.Sum(nil))

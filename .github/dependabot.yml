@@ -6,6 +6,8 @@ updates:
       interval: "daily"
       time: "06:00"
       timezone: "Asia/Kuala_Lumpur"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     groups:
       go-dependencies:
@@ -22,6 +24,8 @@ updates:
       interval: "daily"
       time: "06:00"
       timezone: "Asia/Kuala_Lumpur"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     groups:
       production-dependencies:
@@ -39,6 +43,8 @@ updates:
       interval: "daily"
       time: "06:00"
       timezone: "Asia/Kuala_Lumpur"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     groups:
       all-security-updates:
@@ -52,6 +58,8 @@ updates:
       interval: "daily"
       time: "06:00"
       timezone: "Asia/Kuala_Lumpur"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     groups:
       all-security-updates:

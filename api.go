@@ -345,6 +345,7 @@ func (api *Api) httpMiddlewareAuthenticate(next http.Handler) http.Handler {
 				Expires:  time.Now().Add(time.Hour * 24 * 365),
 				SameSite: http.SameSiteStrictMode,
 				HttpOnly: true,
+				Secure:   true,
 			})
 		}
 
