@@ -9,6 +9,7 @@
   <meta name='mobile-web-app-capable' content='yes'>
   <meta name='apple-mobile-web-app-capable' content='yes'>
   <meta name='apple-mobile-web-app-status-bar-style' content='black'>
+  <meta name="storm-base-api-path" content="{{ .BaseAPIPath }}">
 
   <link rel='icon' type='image/png' href='assets/logo@32.png'>
   <link rel='icon' sizes='192x192' href='assets/logo@192.png'>
@@ -17,7 +18,7 @@
 
   <script type="text/javascript">
     window.environment = {
-      baseApiPath: '{{ .BaseAPIPath }}'
+      baseApiPath: document.querySelector('meta[name="storm-base-api-path"]').content
     }
   </script>
 </head>
